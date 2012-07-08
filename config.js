@@ -3,3 +3,7 @@ exports.serverinfo = {
 };
 
 exports.db = {};
+
+exports.template = {
+	isCache: false
+}

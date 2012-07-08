@@ -10,7 +10,12 @@ var IndexController = function(simpleRequest){
 util.inherits(IndexController, AbstractController);
 
 IndexController.prototype.indexAction = function(){
-	console.log('index/index');
+	
+	this.bind({
+		username: '杜凯',
+		age: '26',
+		sex: '男'
+	});
 }
 
 exports.newInstance = function(simpleRequest){
