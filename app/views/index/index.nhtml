@@ -9,6 +9,15 @@
 	<div>姓名: <?= this.username?></div>
 	<div>年龄: <?= this.age?></div>
 	<div>性别: <?= this.sex?></div>
+	<div class="toolbar">
+	</div>
+	<div>
+		<?
+			var a = 1;
+			var b = 2;
+			print(a + b);
+		?>
+	</div>
 	<div><img src="/images/dk.png" /></div>
 	<form method="post" enctype="multipart/form-data">
 	<ul>

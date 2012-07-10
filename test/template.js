@@ -9,4 +9,4 @@ content = fs.readFileSync(path, 'utf8');
 
 var tmpl = new Template(content);
 
-//console.log(tmpl.render({a: 'dk'}));
+console.log(tmpl.render({a: 'dk'}));
