@@ -3,19 +3,16 @@ var debug = require('../../lib/utils/debug').debug;
 var util = require('util');
 
 var IndexController = function(simpleRequest){
-
 	AbstractController.call(this, simpleRequest);
+	
 }
 
 util.inherits(IndexController, AbstractController);
 
 IndexController.prototype.indexAction = function(){
-	
-	this.bind({
-		username: '杜凯',
-		age: '26',
-		sex: '男'
-	});
+	this.view.username =  '杜凯',
+	this.view.age = '26',
+	this.view.sex = '男'
 }
 
 exports.newInstance = function(simpleRequest){
