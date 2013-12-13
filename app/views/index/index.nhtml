@@ -28,7 +28,6 @@
 		<li><input type="submit" value="submit" /></li>
 	</ul>
 	</form>
-	<script src="js/dk_tools.js"></script>
+	<script src="/js/dk_tools.js"></script>
 </body>
-
 </html>

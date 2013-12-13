@@ -8,6 +8,9 @@ exports.template = {
 	isCache: false
 };
 
+exports.app_path = '';
+exports.file_path = '';
+
 
 exports.routes = [
 	{

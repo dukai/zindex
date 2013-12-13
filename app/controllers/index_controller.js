@@ -1,20 +1,24 @@
-var AbstractController = require('../../lib/abstract_controller').AbstractController;
+var AbstractController = require('../../lib/abstract_controller'),
+	oo = require('../../lib/utils/oo');
 var debug = require('../../lib/utils/debug').debug;
 var util = require('util');
 
-var IndexController = function(simpleRequest){
-	AbstractController.call(this, simpleRequest);
-	
+var IndexController = function(intent){
+	this._initIndexController(intent);
+};
+
+IndexController.prototype = {
+	_initIndexController: function(intent){
+		AbstractController.call(this, intent);
+	},
+
+	indexAction: function(){
+		this.view.username =  '杜凯',
+		this.view.age = '26',
+		this.view.sex = '男'
+	}
 }
 
-util.inherits(IndexController, AbstractController);
+oo.extend(IndexController, AbstractController);
 
-IndexController.prototype.indexAction = function(){
-	this.view.username =  '杜凯',
-	this.view.age = '26',
-	this.view.sex = '男'
-}
-
-exports.newInstance = function(simpleRequest){
-	return new IndexController(simpleRequest);
-}
+module.exports = IndexController;
