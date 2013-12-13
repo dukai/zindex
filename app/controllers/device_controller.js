@@ -13,6 +13,8 @@ DeviceController.prototype = {
 	},
 
 	indexAction: function(){
+		this.setNoRender();
+		var self = this;
 		this.view.username =  '杜凯',
 		this.view.age = '26',
 		this.view.sex = '男'
@@ -25,7 +27,23 @@ DeviceController.prototype = {
 
 		var result = JSON.stringify(devices);
 
-		this.json(result);
+		var mysql      = require('mysql');
+		var connection = mysql.createConnection({
+			host     : 'localhost',
+			user     : 'root',
+			password : 'yeelink',
+			database: 'yeelink'
+		});
+
+		connection.connect();
+
+		connection.query('select * from yl_devices', function(err, rows, fields) {
+			self.json(JSON.stringify(rows));
+		});
+
+		connection.end();
+
+
 	}
 }
 
