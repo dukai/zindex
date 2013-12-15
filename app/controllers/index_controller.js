@@ -1,6 +1,6 @@
-var AbstractController = require('../../lib/abstract_controller'),
-	oo = require('../../lib/utils/oo');
-var debug = require('../../lib/utils/debug').debug;
+var AbstractController = require('mvc/lib/abstract_controller'),
+	oo = require('mvc/lib/utils/oo');
+var debug = require('mvc/lib/utils/debug').debug;
 var util = require('util');
 
 var IndexController = function(intent){

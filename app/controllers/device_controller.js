@@ -1,6 +1,5 @@
-var AbstractController = require('../../lib/abstract_controller'),
-	oo = require('../../lib/utils/oo');
-var debug = require('../../lib/utils/debug').debug;
+var AbstractController = require('mvc/lib/abstract_controller'),
+	oo = require('mvc/lib/utils/oo');
 var util = require('util');
 
 var DeviceController = function(intent){
@@ -15,9 +14,6 @@ DeviceController.prototype = {
 	indexAction: function(){
 		this.setNoRender();
 		var self = this;
-		this.view.username =  '杜凯',
-		this.view.age = '26',
-		this.view.sex = '男'
 
 		var devices = {
 			title: 'first device',
@@ -42,8 +38,6 @@ DeviceController.prototype = {
 		});
 
 		connection.end();
-
-
 	}
 }
 
