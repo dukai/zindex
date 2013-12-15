@@ -10,7 +10,7 @@
 	<div>年龄: <?= this.age?></div>
 	<div>性别: <?= this.sex?></div>
 	<div class="toolbar">
-		<?=this.partial('toolbar')?>
+		<?=this.partial('index/toolbar.nhtml')?>
 	</div>
 	<div>
 		<?
