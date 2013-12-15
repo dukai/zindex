@@ -16,7 +16,12 @@ IndexController.prototype = {
 		this.view.username =  '杜凯',
 		this.view.age = '26',
 		this.view.sex = '男'
-	}
+	},
+
+    testAction: function(){
+        this.setNoRender();
+        this.redirect('/');
+    }
 }
 
 oo.extend(IndexController, AbstractController);
