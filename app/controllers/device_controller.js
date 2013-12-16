@@ -49,8 +49,36 @@ DeviceController.prototype = {
 	},
 
 	_createDevice: function(){
+        var self = this;
+        var db = this.getDb();
+
 		this.getRawPost(function(err, data){
-            var data = JSON.parse(data);
+            try{
+                var data = JSON.parse(data);
+                var device = {
+                    'user_login': self.member.user_login,
+                    'device_uuid':'',
+                    'device_manufacturer':1,
+                    'device_title':data['title'],
+                    'device_about':data['about'],
+                    'device_tags':data['tags'].join(','),
+                    'device_loc_name':data['location']['local'],
+                    'device_lat':parseFloat(data['location']['latitude']),
+                    'device_lng':parseFloat(data['location']['longitude']),
+                    'device_exposure':1,
+                    'device_disposition':1,
+                    'device_privacy':1,
+                    'device_status':1
+                };
+                 db.insert('yl_devices', device, function(err, result) {
+                 self.json(JSON.stringify(result.insertId));
+                 });
+
+            }catch (e){
+                self.json(JSON.stringify('JSON字符串内容不规范'));
+            }
+
+
 		});
 	},
 	_listDevice: function(){
