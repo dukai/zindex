@@ -2,7 +2,13 @@ exports.serverinfo = {
 	port: 8001
 };
 
-exports.db = {};
+exports.db = {
+	host: 'localhost',
+	user: 'root',
+	password: 'yeelink',
+	database: 'yeelink',
+	charset: 'UTF8_GENERAL_CI'
+};
 
 exports.template = {
 	isCache: false
@@ -21,14 +27,14 @@ exports.routes = [
 	},
 
 	{
-		url: '/v1.1/devices/{device_id}',
+		url: '/v1.1/device/{device_id}',
 		module: 'api',
 		controller: 'device',
-		action: 'show'
+		action: 'single'
 	},
 
 	{
-		url: '/v1.1/devices/{device_id}/sensors',
+		url: '/v1.1/device/{device_id}/sensors',
 		module: 'api',
 		controller: 'device',
 		action: 'sensors'
