@@ -13,9 +13,8 @@ ErrorController.prototype = {
     },
 
     indexAction: function(){
-        this.view.username =  '杜凯',
-            this.view.age = '26',
-            this.view.sex = '男'
+        this.view.message = this.getParam('message');
+        this.view.info = this.getParam('info');
     }
 }
 

@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>404</title>
+    <title>404 <?= this.message?></title>
 </head>
 
 <body>
-<h1>404 ERROR</h1>
+<h1><?= this.message?></h1>
+<ul>
+    <?for(var i in this.info){?>
+    <li><?=i?>: <?=this.info[i]?></li>
+    <?}?>
+</ul>
+<hr />
+<p>Powered by DK</p>
 </body>
 
 </html>
