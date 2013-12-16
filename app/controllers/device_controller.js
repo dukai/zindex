@@ -50,7 +50,7 @@ DeviceController.prototype = {
 
 	_createDevice: function(){
 		this.getRawPost(function(err, data){
-
+            var data = JSON.parse(data);
 		});
 	},
 	_listDevice: function(){
@@ -70,8 +70,16 @@ DeviceController.prototype = {
 	_editDevice: function(){
 
 	},
+    /**
+     * 删除设备
+     * @private
+     */
 	_deleteDevice: function(){
-
+        var self = this;
+        this.getDb().fetchRow("delete from yl_devices where id=" + this.getParam('device_id', 0), function(err, row){
+            self.response.writeHead(200, {});
+            self.response.end();
+        });
 	}
 }
 
