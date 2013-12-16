@@ -1,4 +1,4 @@
-var BaseController = require('./base-controller'),
+var BaseController = require('./base_controller'),
 	oo = require('mvc/lib/utils/oo');
 var util = require('util');
 
@@ -10,12 +10,12 @@ DeviceController.prototype = {
 	_initDeviceController: function(intent){
 		BaseController.call(this, intent);
 	},
-
+/*
 	_init: function(){
-		//DeviceController.parent._init.call(this);
+		DeviceController.parent._init.call(this);
 		//console.log('init device controller');
 	},
-
+*/
 	indexAction: function(){
 		this.setNoRender();
 
