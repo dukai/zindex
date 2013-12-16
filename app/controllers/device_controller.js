@@ -12,8 +12,8 @@ DeviceController.prototype = {
 	},
 
 	_init: function(){
-		DeviceController.parent._init.call(this);
-		console.log('init device controller');
+		//DeviceController.parent._init.call(this);
+		//console.log('init device controller');
 	},
 
 	indexAction: function(){
@@ -30,12 +30,6 @@ DeviceController.prototype = {
 				break;
 		}
 
-		var result = JSON.stringify(devices);
-		var db = this.getDb();
-
-		db.fetchAll('select * from yl_devices limit 20', function(err, rows, fields) {
-			self.json(JSON.stringify(rows));
-		});
 	},
 
 	singleAction: function(){
@@ -60,7 +54,11 @@ DeviceController.prototype = {
 		});
 	},
 	_listDevice: function(){
-
+        var self = this;
+        var db = this.getDb();
+        db.fetchAll('select * from yl_devices limit 20', function(err, rows, fields) {
+            self.json(JSON.stringify(rows));
+        });
 	},
 
 	_viewDevice: function(){
