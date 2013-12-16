@@ -20,7 +20,7 @@ User.prototype = {
         var sql = "select * from yl_users where user_access_key='" + apiKey + "' limit 1";
         this.db.fetchRow(sql, function(err, row){
             if(row){
-                callback(true);
+                callback(true, row);
             }else{
                 callback(false);
             }
