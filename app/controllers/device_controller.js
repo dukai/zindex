@@ -35,16 +35,19 @@ DeviceController.prototype = {
 	singleAction: function(){
 		var self = this;
 		this.setNoRender();
+        var deviceId = this.getParam('device_id', 0);
 		switch (this._getMethod()){
 			case 'get':
-				this._viewDevice();
+				this._viewDevice(deviceId);
 				break;
 			case 'put':
-				this._editDevice();
+				this._editDevice(deviceId);
 				break;
 			case 'delete':
-				this._deleteDevice();
+				this._deleteDevice(deviceId);
 				break;
+            default :
+                break;
 		}
 	},
 
@@ -89,22 +92,60 @@ DeviceController.prototype = {
         });
 	},
 
-	_viewDevice: function(){
+	_viewDevice: function(deviceId){
 		var self = this;
-		this.getDb().fetchRow("select * from yl_devices where id=" + this.getParam('device_id', 0), function(err, row){
+		this.getDb().fetchRow("select * from yl_devices where id=" + deviceId, function(err, row){
 			self.json(JSON.stringify(row));
 		});
 	},
-	_editDevice: function(){
+	_editDevice: function(deviceId){
+        var self = this;
+        var db = this.getDb();
+        this.getRawPost(function(err, data){
+            try{
+                var data = JSON.parse(data);
+                var device = {};
 
+                if(data.title){
+                    device.device_title = data.title;
+                }
+
+                if(data.about){
+                    device.device_about = data.about;
+                }
+                if(data.tags){
+                    device.device_tags = data['tags'].join(',');
+                }
+
+                if(data.location && data.location.local){
+                    device.device_loc_name = data['location']['local'];
+                }
+                if(data.location && data.location.latitude){
+                    device.device_lat = data['location']['latitude'];
+                }
+                if(data.location && data.location.longitude){
+                    device.device_lng = data['location']['longitude'];
+                }
+
+                db.update('yl_devices', device, {id: deviceId}, function(err, result) {
+                    self.json(JSON.stringify(1));
+                });
+
+            }catch (e){
+                console.log(e);
+                self.json(JSON.stringify('JSON字符串内容不规范'));
+            }
+
+
+        });
 	},
     /**
      * 删除设备
      * @private
      */
-	_deleteDevice: function(){
+	_deleteDevice: function(deviceId){
         var self = this;
-        this.getDb().fetchRow("delete from yl_devices where id=" + this.getParam('device_id', 0), function(err, row){
+        this.getDb().fetchRow("delete from yl_devices where id=" + deviceId, function(err, row){
             self.response.writeHead(200, {});
             self.response.end();
         });
