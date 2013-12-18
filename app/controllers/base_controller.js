@@ -44,6 +44,15 @@ BaseController.prototype = {
 		}
 
 		return method;
+	},
+	/**
+	 * 未定义操作
+	 * @private
+	 */
+	_undefinedAction:function(){
+		var self = this;
+		self.response.writeHead(405, {});
+		self.response.end('Undefined Action');
 	}
 }
 

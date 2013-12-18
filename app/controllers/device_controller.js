@@ -154,12 +154,6 @@ DeviceController.prototype = {
             self.response.writeHead(200, {});
             self.response.end();
         });
-	},
-
-	_undefinedAction:function(){
-		var self = this;
-		self.response.writeHead(405, {});
-		self.response.end('Undefined Action');
 	}
 }
 
