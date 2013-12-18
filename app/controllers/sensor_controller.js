@@ -1,5 +1,6 @@
 var BaseController = require('./base_controller'),
-	oo = require('mvc/lib/utils/oo');
+	oo = require('mvc/lib/utils/oo'),
+    Sensor = require('../models/sensor');
 var util = require('util');
 
 var SensorController = function(intent){
@@ -12,7 +13,21 @@ SensorController.prototype = {
 	},
 
 	indexAction: function(){
+        this.setNoRender();
 
+        var self = this;
+        var deviceId = parseInt(this.getParam('device_id', 0));
+        switch (this._getMethod()){
+            case 'get':
+                this._listSensor(deviceId);
+                break;
+            case 'post':
+                this._createSensor(deviceId);
+                break;
+            default :
+                this._undefinedAction();
+                break;
+        }
 	},
 
 	singleAction: function(){
@@ -21,7 +36,17 @@ SensorController.prototype = {
 
 	historyDataAction: function(){
 
-	}
+	},
+
+
+    _createSensor: function(deviceId){
+        
+    },
+
+    _listSensor: function(deviceId){
+
+    }
+
 
 }
 

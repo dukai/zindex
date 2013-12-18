@@ -10,12 +10,11 @@ DeviceController.prototype = {
 	_initDeviceController: function(intent){
 		BaseController.call(this, intent);
 	},
-/*
-	_init: function(){
-		DeviceController.parent._init.call(this);
-		//console.log('init device controller');
+	_init: function(dispatchActionCallback){
+		DeviceController.parent._init.call(this, function(status){
+            dispatchActionCallback(true);
+        });
 	},
-*/
 	indexAction: function(){
 		this.setNoRender();
 
@@ -39,21 +38,36 @@ DeviceController.prototype = {
 		var self = this;
 		this.setNoRender();
         var deviceId = this.getParam('device_id', 0);
-		switch (this._getMethod()){
-			case 'get':
-				this._viewDevice(deviceId);
-				break;
-			case 'put':
-				this._editDevice(deviceId);
-				break;
-			case 'delete':
-				this._deleteDevice(deviceId);
-				break;
-            default :
-	            this._undefinedAction();
-                break;
-		}
+
+        this._checkPermission(deviceId, function(){
+            switch (self._getMethod()){
+                case 'get':
+                    self._viewDevice(deviceId);
+                    break;
+                case 'put':
+                    self._editDevice(deviceId);
+                    break;
+                case 'delete':
+                    self._deleteDevice(deviceId);
+                    break;
+                default :
+                    self._undefinedAction();
+                    break;
+            }
+        });
+
+
 	},
+
+    _checkPermission: function(deviceId, callback){
+        var db = this.getDb();
+        var sql = "select count(*) as count from yl_devices where user_login='" + this.member.user_login + "' and id=" + deviceId ;
+        db.fetchRow(sql, function(err, rows) {
+            if(rows.count > 0){
+                callback();
+            }
+        });
+    },
 
 	_createDevice: function(){
         var self = this;
