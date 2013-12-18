@@ -28,6 +28,9 @@ DeviceController.prototype = {
 			case 'post':
 				this._createDevice();
 				break;
+			default :
+				this._undefinedAction();
+				break;
 		}
 
 	},
@@ -47,6 +50,7 @@ DeviceController.prototype = {
 				this._deleteDevice(deviceId);
 				break;
             default :
+	            this._undefinedAction();
                 break;
 		}
 	},
@@ -88,7 +92,6 @@ DeviceController.prototype = {
         var self = this;
         var db = this.getDb();
 		var sql = "select * from yl_devices where user_login='" + this.member.user_login + "' limit 20";
-		console.log(sql);
         db.fetchAll(sql, function(err, rows, fields) {
             self.json(JSON.stringify(rows));
         });
@@ -151,6 +154,12 @@ DeviceController.prototype = {
             self.response.writeHead(200, {});
             self.response.end();
         });
+	},
+
+	_undefinedAction:function(){
+		var self = this;
+		self.response.writeHead(405, {});
+		self.response.end('Undefined Action');
 	}
 }
 
