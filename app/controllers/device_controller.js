@@ -87,7 +87,9 @@ DeviceController.prototype = {
 	_listDevice: function(){
         var self = this;
         var db = this.getDb();
-        db.fetchAll('select * from yl_devices limit 20', function(err, rows, fields) {
+		var sql = "select * from yl_devices where user_login='" + this.member.user_login + "' limit 20";
+		console.log(sql);
+        db.fetchAll(sql, function(err, rows, fields) {
             self.json(JSON.stringify(rows));
         });
 	},
