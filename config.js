@@ -19,39 +19,47 @@ exports.file_path = '';
 
 
 exports.routes = [
+	//Device.Create, Device.List
 	{
 		url: '/v1.1/devices',
 		module: 'api',
 		controller: 'device',
 		action: 'index'
 	},
-
+	//Device.View, Device.Edit, Device.Delete
 	{
 		url: '/v1.1/device/{device_id}',
 		module: 'api',
 		controller: 'device',
 		action: 'single'
 	},
-
+	//Sensor: Create, List
 	{
 		url: '/v1.1/device/{device_id}/sensors',
 		module: 'api',
-		controller: 'device',
-		action: 'sensors'
+		controller: 'sensor',
+		action: 'index'
 	},
-
+	//History Data
 	{
 		url: '/v1.1/device/{device_id}/sensor/{sensor_id}.json',
 		module: 'api',
-		controller: 'device',
+		controller: 'sensor',
 		action: 'history-data'
+	},
+	//Sensor: View, Edit, Delete
+	{
+		url: '/v1.1/device/{device_id}/sensor/{sensor_id}',
+		module: 'api',
+		controller: 'device',
+		action: 'single'
 	},
 
 	{
 		url: '/v1.1/user/api-key',
 		module: 'api',
-		controller: 'device',
-		action: 'history-data'
+		controller: 'apiKey',
+		action: 'index'
 	}
 
 ];
