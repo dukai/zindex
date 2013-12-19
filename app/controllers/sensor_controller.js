@@ -82,7 +82,8 @@ SensorController.prototype = {
 			if(rows.count > 0){
 				callback();
 			}else{
-				self.json("API Key And Device Id Not Match");
+                self.statusCode = 406;
+				self.json("API Key And Device Id  Not Match or Sensor Id NOT Exits");
 			}
 		});
 
@@ -137,6 +138,7 @@ SensorController.prototype = {
 			    });
 
 		    }catch (e){
+                self.statusCode = 406;
 			    self.json(JSON.stringify('JSON字符串内容不规范'));
 		    }
 
@@ -243,6 +245,7 @@ SensorController.prototype = {
                 });
 
             }catch (e){
+                self.statusCode = 406;
                 self.json(JSON.stringify('JSON字符串内容不规范'));
             }
 

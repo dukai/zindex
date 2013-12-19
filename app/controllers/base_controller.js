@@ -16,7 +16,7 @@ BaseController.prototype = {
         var user = new User();
         user.existsByAPIKey(this._getAPIKey(), function(status, row){
             if(!status){
-                self.response.writeHead(403, {'Content-Type': 'text/html; charset=utf-8'});
+                self.response.writeHead(403);
                 self.response.end("U-ApiKey Incorrect")
             }else{
                 self.member = row;
