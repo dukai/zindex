@@ -15,7 +15,7 @@ Sensor.prototype = {
 oo.extend(Sensor, AbstractModel);
 
 Sensor.Type = {
-	DATA: 0,
+	VALUE: 0,
 	SWITCHER: 5,
 	GPS: 6,
 	GEN: 8,
