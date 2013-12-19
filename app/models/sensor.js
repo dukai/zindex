@@ -14,4 +14,20 @@ Sensor.prototype = {
 
 oo.extend(Sensor, AbstractModel);
 
+Sensor.Type = {
+	DATA: 0,
+	SWITCHER: 5,
+	GPS: 6,
+	GEN: 8,
+	PHOTO: 9,
+	WEIBO: 10
+};
+
+Sensor.DataType = {
+	VALUE: 0,
+	EVENT: 1,
+	GEN: 3,
+	BIN: 4
+};
+
 module.exports = Sensor;
