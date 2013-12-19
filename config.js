@@ -51,7 +51,7 @@ exports.routes = [
 	{
 		url: '/v1.1/device/{device_id}/sensor/{sensor_id}',
 		module: 'api',
-		controller: 'device',
+		controller: 'sensor',
 		action: 'single'
 	},
 
