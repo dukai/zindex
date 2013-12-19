@@ -58,13 +58,21 @@ DeviceController.prototype = {
 
 
 	},
-
+	/**
+	 * 检查设备ID与用户信息是否相符
+	 * @param deviceId
+	 * @param callback
+	 * @private
+	 */
     _checkPermission: function(deviceId, callback){
+	    var self = this;
         var db = this.getDb();
         var sql = "select count(*) as count from yl_devices where user_login='" + this.member.user_login + "' and id=" + deviceId ;
         db.fetchRow(sql, function(err, rows) {
             if(rows.count > 0){
                 callback();
+            }else{
+	            self.json("API Key And Device Id Not Match");
             }
         });
     },
