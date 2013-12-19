@@ -45,10 +45,10 @@ SensorController.prototype = {
 					self._viewSensor(deviceId, sensorId);
 					break;
 				case 'put':
-					self._editDevice(deviceId);
+					self._editSensor(deviceId, sensorId);
 					break;
 				case 'delete':
-					self._deleteDevice(deviceId);
+					self._deleteSensor(deviceId, sensorId);
 					break;
 				default :
 					self._undefinedAction();
@@ -165,20 +165,106 @@ SensorController.prototype = {
 					last_data_gen: r.sensor_last_data_gen
 				};
 
+                if(r.sensor_type == Sensor.Type.VALUE){
+                    sensor.unit_name = r.sensor_unit;
+                    sensor.unit_symbol = r.sensor_unit_symbol;
+                }
+
 				result.push(sensor);
 			}
 
 			self.json(JSON.stringify(result));
 		});
     },
-
+    /**
+     * 查看传感器信息
+     * @param deviceId
+     * @param sensorId
+     * @private
+     */
 	_viewSensor: function(deviceId, sensorId){
 		var self = this;
 		var sql = "select * from yl_sensors where id=" + sensorId;
 		this.getDb().fetchRow(sql, function(err, row){
-			self.json(JSON.stringify(row));
+            //TODO: 根据API格式化数据格式
+            var sensor = {
+                id: row.id,
+                title: row.sensor_title,
+                about: row.sensor_about,
+                type: row.sensor_type,
+                last_update: row.sensor_last_update
+            };
+
+            if(row.sensor_type == Sensor.Type.VALUE){
+                sensor.unit_name = row.sensor_unit;
+                sensor.unit_symbol = row.sensor_unit_symbol;
+                sensor.last_data = row.sensor_last_data;
+            }
+            console.log(sensor);
+			self.json(JSON.stringify(sensor));
 		});
-	}
+	},
+    /**
+     * 编辑传感器信息
+     * @param deviceId
+     * @param sensorId
+     * @private
+     */
+    _editSensor: function(deviceId, sensorId){
+        var self = this;
+        var db = this.getDb();
+        this.getRawPost(function(err, data){
+            try{
+                var data = JSON.parse(data);
+                var sensor = {
+                };
+
+                if(data.title){
+                    sensor.sensor_title = data.title;
+                }
+
+                if(data.about){
+                    sensor.sensor_about = data.about;
+                }
+                if(data.tags){
+                    sensor.sensor_tags = data['tags'].join(',');
+                }
+
+                if(data.unit && data.unit.name){
+                    sensor.sensor_unit = data.unit.name;
+                }
+
+                if(data.unit && data.unit.symbol){
+                    sensor.sensor_unit_symbol = data.unit.symbol;
+                }
+
+                db.update('yl_sensors', sensor, {id: sensorId}, function(err, result) {
+                    self.json(JSON.stringify(1));
+                });
+
+            }catch (e){
+                self.json(JSON.stringify('JSON字符串内容不规范'));
+            }
+
+
+        });
+    },
+    /**
+     * 删除传感器信息
+     * @param deviceId
+     * @param sensorId
+     * @private
+     */
+    _deleteSensor: function(deviceId, sensorId){
+        var self = this;
+        var sql = "delete from yl_sensors where id=" + sensorId;
+        var db = this.getDb();
+        db.query(sql, function(err, row){
+            self.json(JSON.stringify(row));
+            //TODO: delete all sensor data，不同的数据类型有不同的处理方式
+
+        });
+    }
 
 };
 
@@ -190,7 +276,7 @@ SensorController.SENSOR_DATA_TYPE = {
 };
 
 SensorController.SENSOR_TYPE = {
-	value: Sensor.Type.DATA,
+	value: Sensor.Type.VALUE,
 	gps: Sensor.Type.GPS,
 	gen: Sensor.Type.GEN,
 	photo: Sensor.Type.PHOTO
