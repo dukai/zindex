@@ -27,7 +27,8 @@ var r4 = new route.Route({
 });
 
 console.log(r.match("/v1.1/device/1221/sensor/2312.json"));
+console.log(r.match('/v1.1/device/2440/sensor/3243'));
 console.log(r2.match("/v1.1/device/1221/sensor/2312.json"));
 console.log(r4.match("/v1.1/device/1221/sensor/2312.json"));
 console.log(r4.match("/v1.1/device/1221/sensor/2312"));
-
+console.log(r4.match('/v1.1/device/2440/sensor/3243'));
