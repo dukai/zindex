@@ -34,7 +34,27 @@ SensorController.prototype = {
 	},
 
 	singleAction: function(){
+		var self = this;
+		this.setNoRender();
+		var deviceId = this.getParam('device_id', 0);
+		var sensorId = parseInt(this.getParam('sensor_id', 0));
 
+		this._checkPermission(deviceId, sensorId, function(){
+			switch (self._getMethod()){
+				case 'get':
+					self._viewSensor(deviceId, sensorId);
+					break;
+				case 'put':
+					self._editDevice(deviceId);
+					break;
+				case 'delete':
+					self._deleteDevice(deviceId);
+					break;
+				default :
+					self._undefinedAction();
+					break;
+			}
+		});
 	},
 
 	historyDataAction: function(){
@@ -44,13 +64,20 @@ SensorController.prototype = {
 	/**
 	 * 检查设备ID与用户信息是否相符
 	 * @param deviceId
+	 * @param sensorId
 	 * @param callback
 	 * @private
 	 */
-	_checkPermission: function(deviceId, callback){
+	_checkPermission: function(deviceId, sensorId, callback){
 		var self = this;
 		var db = this.getDb();
-		var sql = "select count(*) as count from yl_devices where user_login='" + this.member.user_login + "' and id=" + deviceId ;
+		var sql = '';
+		if(arguments.length == 2){
+			callback = sensorId;
+			sql = "select count(*) as count from yl_devices where user_login='" + this.member.user_login + "' and id=" + deviceId ;
+		}else{
+			sql = "select count(*) as count from yl_sensors where user_login='" + this.member.user_login + "' and device_id=" + deviceId + " and id=" + sensorId;
+		}
 		db.fetchRow(sql, function(err, rows) {
 			if(rows.count > 0){
 				callback();
@@ -58,6 +85,7 @@ SensorController.prototype = {
 				self.json("API Key And Device Id Not Match");
 			}
 		});
+
 	},
 	/**
 	 * 创建设备
@@ -142,7 +170,15 @@ SensorController.prototype = {
 
 			self.json(JSON.stringify(result));
 		});
-    }
+    },
+
+	_viewSensor: function(deviceId, sensorId){
+		var self = this;
+		var sql = "select * from yl_sensors where id=" + sensorId;
+		this.getDb().fetchRow(sql, function(err, row){
+			self.json(JSON.stringify(row));
+		});
+	}
 
 };
 
