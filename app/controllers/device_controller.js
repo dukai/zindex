@@ -11,13 +11,12 @@ DeviceController.prototype = {
 		BaseController.call(this, intent);
 	},
 	_init: function(dispatchActionCallback){
+        this.setNoRender();
 		DeviceController.parent._init.call(this, function(status){
             dispatchActionCallback(true);
         });
 	},
 	indexAction: function(){
-		this.setNoRender();
-
 		var self = this;
 
 		switch (this._getMethod()){
@@ -36,7 +35,6 @@ DeviceController.prototype = {
 
 	singleAction: function(){
 		var self = this;
-		this.setNoRender();
         var deviceId = this.getParam('device_id', 0);
 
         this._checkPermission(deviceId, function(){
