@@ -39,16 +39,16 @@ SensorController.prototype = {
 		var deviceId = this.getParam('device_id', 0);
 		var sensorId = parseInt(this.getParam('sensor_id', 0));
 
-		this._checkPermission(deviceId, sensorId, function(){
+		this._checkPermission(deviceId, sensorId, function(sensor){
 			switch (self._getMethod()){
 				case 'get':
-					self._viewSensor(deviceId, sensorId);
+					self._viewSensor(sensor);
 					break;
 				case 'put':
-					self._editSensor(deviceId, sensorId);
+					self._editSensor(sensorId);
 					break;
 				case 'delete':
-					self._deleteSensor(deviceId, sensorId);
+					self._deleteSensor(deviceId, sensorId, sensor.sensor_type);
 					break;
 				default :
 					self._undefinedAction();
@@ -74,13 +74,13 @@ SensorController.prototype = {
 		var sql = '';
 		if(arguments.length == 2){
 			callback = sensorId;
-			sql = "select count(*) as count from yl_devices where user_login='" + this.member.user_login + "' and id=" + deviceId ;
+			sql = "select * from yl_devices where user_login='" + this.member.user_login + "' and id=" + deviceId ;
 		}else{
-			sql = "select count(*) as count from yl_sensors where user_login='" + this.member.user_login + "' and device_id=" + deviceId + " and id=" + sensorId;
+			sql = "select * from yl_sensors where user_login='" + this.member.user_login + "' and device_id=" + deviceId + " and id=" + sensorId;
 		}
-		db.fetchRow(sql, function(err, rows) {
-			if(rows.count > 0){
-				callback();
+		db.fetchRow(sql, function(err, row) {
+			if(row){
+				callback(row);
 			}else{
                 self.statusCode = 406;
 				self.json("API Key And Device Id  Not Match or Sensor Id NOT Exits");
@@ -101,9 +101,11 @@ SensorController.prototype = {
 	    this.getRawPost(function(err, data){
 		    try{
 			    var data = JSON.parse(data);
+			    if(!data.type){
+				    data.type = 'value';
+			    }
 
-
-			    if(!data.type || SensorController.SENSOR_DATA_TYPE[data.type] === undefined || SensorController.SENSOR_TYPE[data.type] === undefined){
+			    if( SensorController.SENSOR_DATA_TYPE[data.type] === undefined || SensorController.SENSOR_TYPE[data.type] === undefined){
 				    self.statusCode = 406;
 				    self.json("Fail to create sensor,please check the data format.");
 				    return;
@@ -180,31 +182,24 @@ SensorController.prototype = {
     },
     /**
      * 查看传感器信息
-     * @param deviceId
-     * @param sensorId
+     * @param sensor
      * @private
      */
-	_viewSensor: function(deviceId, sensorId){
-		var self = this;
-		var sql = "select * from yl_sensors where id=" + sensorId;
-		this.getDb().fetchRow(sql, function(err, row){
-            //TODO: 根据API格式化数据格式
-            var sensor = {
-                id: row.id,
-                title: row.sensor_title,
-                about: row.sensor_about,
-                type: row.sensor_type,
-                last_update: row.sensor_last_update
-            };
+	_viewSensor: function(sensor){
+        var sensorResult = {
+            id: sensor.id,
+            title: sensor.sensor_title,
+            about: sensor.sensor_about,
+            type: sensor.sensor_type,
+            last_update: sensor.sensor_last_update
+        };
 
-            if(row.sensor_type == Sensor.Type.VALUE){
-                sensor.unit_name = row.sensor_unit;
-                sensor.unit_symbol = row.sensor_unit_symbol;
-                sensor.last_data = row.sensor_last_data;
-            }
-            console.log(sensor);
-			self.json(JSON.stringify(sensor));
-		});
+        if(sensor.sensor_type == Sensor.Type.VALUE){
+	        sensorResult.unit_name = sensor.sensor_unit;
+	        sensorResult.unit_symbol = sensor.sensor_unit_symbol;
+	        sensorResult.last_data = sensor.sensor_last_data;
+        }
+		this.json(JSON.stringify(sensorResult));
 	},
     /**
      * 编辑传感器信息
@@ -212,7 +207,7 @@ SensorController.prototype = {
      * @param sensorId
      * @private
      */
-    _editSensor: function(deviceId, sensorId){
+    _editSensor: function(sensorId){
         var self = this;
         var db = this.getDb();
         this.getRawPost(function(err, data){
@@ -256,18 +251,47 @@ SensorController.prototype = {
      * 删除传感器信息
      * @param deviceId
      * @param sensorId
+     * * @param sensorType
      * @private
      */
-    _deleteSensor: function(deviceId, sensorId){
+    _deleteSensor: function(deviceId, sensorId, sensorType){
         var self = this;
         var sql = "delete from yl_sensors where id=" + sensorId;
+	    var updateDeviceSql = "update yl_devices set sensor_amount=sensor_amount-1 where id='" + deviceId + "' and sensor_amount > 0";
+	    var deleteTriggerSql = "DELETE FROM yl_triggers WHERE sensor_id ="  + sensorId;
+
         var db = this.getDb();
+
         db.query(sql, function(err, row){
-            self.json(JSON.stringify(row));
-            //TODO: delete all sensor data，不同的数据类型有不同的处理方式
+
+	        db.query(updateDeviceSql, function(err, result){
+		        self.json(JSON.stringify(1));
+		        db.query(deleteTriggerSql, function(err, result){
+			        self._deleteData(sensorId, sensorType);
+		        });
+	        });
 
         });
-    }
+    },
+
+	_deleteData: function(sensorId, sensorType){
+
+		//TODO: 完善数据删除部分内容
+		//数值型
+		if(sensorType == Sensor.Type.VALUE || sensorType == Sensor.Type.SWITCHER){
+			var deleteDataSql = "delete from yl_sensor_data where sensorId=" + sensorId;
+			this.getDb().query(deleteDataSql);
+		}
+		//泛型
+		if(sensorType == Sensor.Type.GEN || sensorType == Sensor.Type.GPS){
+			var deleteDataSql = "delete from yl_sensor_data_gen where sensorId=" + sensorId;
+			this.getDb().query(deleteDataSql);
+		}
+		//图片型
+		if(sensorType == Sensor.Type.PHOTO){
+			
+		}
+	}
 
 };
 
