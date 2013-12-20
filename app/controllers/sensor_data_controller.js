@@ -1,6 +1,5 @@
 var BaseController = require('./base_controller'),
-	oo = require('mvc/lib/utils/oo'),
-	Sensor = require('../models/sensor');
+	oo = require('mvc/lib/utils/oo');
 var util = require('util');
 
 var SensorDataController = function(intent){
@@ -10,7 +9,12 @@ var SensorDataController = function(intent){
 SensorDataController.prototype = {
 	_initSensorDataController: function(intent){
 		BaseController.call(this, intent);
-	}
+	},
+
+    indexAction: function(){
+        this.setNoRender();
+        this.json("HELLO");
+    }
 };
 oo.extend(SensorDataController, BaseController);
 
