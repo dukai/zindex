@@ -11,9 +11,19 @@ SensorDataController.prototype = {
 		BaseController.call(this, intent);
 	},
 
-    indexAction: function(){
+    _init: function(dispatchActionCallback){
         this.setNoRender();
+        SensorDataController.parent._init.call(this, function(status){
+            dispatchActionCallback(true);
+        });
+    },
+
+    indexAction: function(){
         this.json("HELLO");
+    },
+
+    datapointsAction: function(){
+        this.json({title: 'helle'});
     }
 };
 oo.extend(SensorDataController, BaseController);
