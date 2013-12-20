@@ -44,7 +44,7 @@ exports.routes = [
 	{
 		url: '/v1.1/device/{device_id}/sensor/{sensor_id}.json',
 		module: 'api',
-		controller: 'sensor',
+		controller: 'sensor-data',
 		action: 'history-data'
 	},
 	//Sensor: View, Edit, Delete
@@ -56,9 +56,23 @@ exports.routes = [
 	},
 
 	{
+		url: '/v1.1/device/{device_id}/sensor/{sensor_id}/datapoints',
+		module: 'api',
+		controller: 'sensor-data',
+		action: 'datapoints'
+	},
+
+	{
+		url: '/v1.1/device/{device_id}/sensor/{sensor_id}/datapoint/{key}',
+		module: 'api',
+		controller: 'sensor-data',
+		action: 'singlePoint'
+	},
+
+	{
 		url: '/v1.1/user/api-key',
 		module: 'api',
-		controller: 'apiKey',
+		controller: 'api-key',
 		action: 'index'
 	}
 

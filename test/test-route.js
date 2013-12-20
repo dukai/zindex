@@ -26,10 +26,21 @@ var r4 = new route.Route({
 	action: 'history-data'
 });
 
+var r5 = new route.Route({
+	url: '/v1.1/device/{device_id}/sensor/{sensor_id}/datapoints',
+	module: 'api',
+	controller: 'sensor-data',
+	action: 'datapoints'
+});
+
+
+console.log(r5.match('/v1.1/device/1424525/sensor/22424/datapoints'));
+/*
 console.log(r.match("/v1.1/device/1221/sensor/2312.json"));
 console.log(r.match('/v1.1/device/2440/sensor/3243'));
 console.log(r3.match('/'));
-/*
+
+
 console.log(r4.match('/v1.1/device/2440/sensor/3243'));
 console.log(r4.match('/v1.1/device/2440/sensor/3243.json'));
 
