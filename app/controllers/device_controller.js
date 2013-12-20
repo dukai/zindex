@@ -122,6 +122,7 @@ DeviceController.prototype = {
 	_viewDevice: function(deviceId){
 		var self = this;
 		this.getDb().fetchRow("select * from yl_devices where id=" + deviceId, function(err, row){
+            //TODO: format data
 			self.json(JSON.stringify(row));
 		});
 	},
