@@ -51,8 +51,7 @@ BaseController.prototype = {
 	 */
 	_undefinedAction:function(){
 		var self = this;
-		self.response.writeHead(405, {});
-		self.response.end('Undefined Action');
+        self.exit("Undefined Operation", 405);
 	}
 }
 
