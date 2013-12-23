@@ -28,6 +28,8 @@ Device.exists = function(userLogin, deviceId, callback){
 }
 
 
-
+Device.ERR_MESSAGE = {
+	API_KEY_DEVICE_NOT_MATCH: "API Key And Device Id NOT Match"
+};
 
 module.exports = Device;
