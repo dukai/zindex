@@ -1,6 +1,8 @@
 var BaseController = require('./base_controller'),
-	oo = require('mvc/lib/utils/oo');
-var util = require('util');
+	oo = require('mvc/lib/utils/oo'),
+	Device = require('../models/device'),
+	Sensor = require('../models/sensor'),
+	SensorData = require('../models/sensor_data');
 
 var SensorDataController = function(intent){
 	this._initSensorDataController(intent);
@@ -58,44 +60,61 @@ SensorDataController.prototype = {
         var sql = '';
         if(arguments.length == 2){
             callback = sensorId;
-            sql = "select * from yl_devices where user_login='" + this.member.user_login + "' and id=" + deviceId ;
+
+	        Device.exists(this.member.user_login, deviceId, function(row){
+		        if(row){
+			        callback(row);
+		        }else{
+			        self.statusCode = 406;
+			        self.json("API Key And Device Id  Not Match or Sensor Id NOT Exits");
+		        }
+
+	        })
         }else{
-            sql = "select * from yl_sensors where user_login='" + this.member.user_login + "' and device_id=" + deviceId + " and id=" + sensorId;
+	        Sensor.exists(this.member.user_login, deviceId, sensorId, function(row){
+		        if(row){
+			        callback(row);
+		        }else{
+			        self.statusCode = 406;
+			        self.json("API Key And Device Id  Not Match or Sensor Id NOT Exits");
+		        }
+	        });
         }
-        db.fetchRow(sql, function(err, row) {
-            if(row){
-                callback(row);
-            }else{
-                self.statusCode = 406;
-                self.json("API Key And Device Id  Not Match or Sensor Id NOT Exits");
-            }
-        });
 
     },
 
-    _createDataPoint: function(sensorId){
+    _createDataPoint: function(sensorId, sensor){
         var self = this;
         var db = this.getDb();
 
+	    var sensorLastUpdate = sensor.sensor_last_update;
 
         this.getRawPost(function(err, data){
             try{
                 var data = JSON.parse(data);
                 if(data.constructor === Array){
                     //TODO: 添加单个设备数据点，需增加类型判断
-                    //self._addSingleDataPoint(data);
-                }else if(data.constructor === Object){
 
+	                for(var i in data){
+		                self._addSingleDataPoint(data[i], sensor);
+	                }
+                }else if(data.constructor === Object){
+	                self._addSingleDataPoint(data, sensor);
                 }
 
             }catch (e){
                 self.statusCode = 406;
-                self.json(JSON.stringify('JSON字符串内容不规范'));
+                self.json('JSON字符串内容不规范');
             }
-
-
         });
-    }
+    },
+
+	_addSingleDataPoint: function(data, sensor){
+		switch (sensor.sensor_type){
+			case Sensor.Type.VALUE:
+				break;
+		}
+	}
 };
 oo.extend(SensorDataController, BaseController);
 
