@@ -25,7 +25,23 @@ Sensor.exists = function(userLogin, deviceId, sensorId, callback){
 			callback(false);
 		}
 	});
-}
+};
+
+//TODO: should move to senser data class
+Sensor.insert = function(data, callback){
+	var db = AbstractModel.getDb();
+	db.insert('yl_sensor_data', data, function(err, result){
+		if(!err){
+			callback(result);
+		}else{
+			callback(false);
+		}
+	});
+};
+
+Sensor.ERR_MESSAGE = {
+	API_KEY_DEVICE_SENSOR_NOT_MATCH: 'API Key And Device Id  Not Match or Sensor Id NOT Exits'
+};
 
 
 Sensor.Type = {
