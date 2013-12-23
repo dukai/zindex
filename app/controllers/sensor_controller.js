@@ -70,22 +70,26 @@ SensorController.prototype = {
 	 */
 	_checkPermission: function(deviceId, sensorId, callback){
 		var self = this;
-		var db = this.getDb();
-		var sql = '';
 		if(arguments.length == 2){
 			callback = sensorId;
-			sql = "select * from yl_devices where user_login='" + this.member.user_login + "' and id=" + deviceId ;
+
+			Device.exists(this.member.user_login, deviceId, function(row){
+				if(row){
+					callback(row);
+				}else{
+					self.exit("API Key And Device Id  Not Match or Sensor Id NOT Exits", 406);
+				}
+
+			})
 		}else{
-			sql = "select * from yl_sensors where user_login='" + this.member.user_login + "' and device_id=" + deviceId + " and id=" + sensorId;
+			Sensor.exists(this.member.user_login, deviceId, sensorId, function(row){
+				if(row){
+					callback(row);
+				}else{
+					self.exit("API Key And Device Id  Not Match or Sensor Id NOT Exits", 406);
+				}
+			});
 		}
-		db.fetchRow(sql, function(err, row) {
-			if(row){
-				callback(row);
-			}else{
-                self.statusCode = 406;
-				self.json("API Key And Device Id  Not Match or Sensor Id NOT Exits");
-			}
-		});
 
 	},
 	/**

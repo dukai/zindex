@@ -1,6 +1,6 @@
 var BaseController = require('./base_controller'),
-	oo = require('mvc/lib/utils/oo');
-var util = require('util');
+	oo = require('mvc/lib/utils/oo'),
+	Device = require('../models/device');
 
 var DeviceController = function(intent){
 	this._initDeviceController(intent);
@@ -64,15 +64,13 @@ DeviceController.prototype = {
 	 */
     _checkPermission: function(deviceId, callback){
 	    var self = this;
-        var db = this.getDb();
-        var sql = "select count(*) as count from yl_devices where user_login='" + this.member.user_login + "' and id=" + deviceId ;
-        db.fetchRow(sql, function(err, rows) {
-            if(rows.count > 0){
-                callback();
-            }else{
-	            self.json("API Key And Device Id Not Match");
-            }
-        });
+		Device.exists(this.member.user_login, deviceId, function(row){
+			if(row){
+				callback(row);
+			}else{
+				self.exit("API Key And Device Id NOT Match", 406);
+			}
+		});
     },
 
 	_createDevice: function(){

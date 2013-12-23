@@ -56,8 +56,6 @@ SensorDataController.prototype = {
      */
     _checkPermission: function(deviceId, sensorId, callback){
         var self = this;
-        var db = this.getDb();
-        var sql = '';
         if(arguments.length == 2){
             callback = sensorId;
 
