@@ -2,7 +2,8 @@ var BaseController = require('./base_controller'),
 	oo = require('mvc/lib/utils/oo'),
 	Device = require('../models/device'),
 	Sensor = require('../models/sensor'),
-	SensorData = require('../models/sensor_data');
+	SensorData = require('../models/sensor_data'),
+	SensorDataHelper = require('../helpers/sensor_data_helper');
 
 var SensorDataController = function(intent){
 	this._initSensorDataController(intent);
@@ -63,7 +64,7 @@ SensorDataController.prototype = {
 		        if(row){
 			        callback(row);
 		        }else{
-			        self.exit("API Key And Device Id  Not Match or Sensor Id NOT Exits", 406);
+			        self.exit(Device.ERR_MESSAGE.API_KEY_DEVICE_NOT_MATCH, 406);
 		        }
 
 	        })
@@ -72,7 +73,7 @@ SensorDataController.prototype = {
 		        if(row){
 			        callback(row);
 		        }else{
-			        self.exit("API Key And Device Id  Not Match or Sensor Id NOT Exits", 406);
+			        self.exit(Sensor.ERR_MESSAGE.API_KEY_DEVICE_SENSOR_NOT_MATCH, 406);
 		        }
 	        });
         }
@@ -99,6 +100,7 @@ SensorDataController.prototype = {
                 }
 
             }catch (e){
+	            throw e;
                 self.statusCode = 406;
                 self.json('JSON字符串内容不规范');
             }
@@ -106,10 +108,51 @@ SensorDataController.prototype = {
     },
 
 	_addSingleDataPoint: function(data, sensor){
+		var self = this;
+		var now = Math.round(new Date().getTime() / 1000);
 		switch (sensor.sensor_type){
 			case Sensor.Type.VALUE:
+				var lastUpdate = sensor.sensor_last_update;
+				if(now - lastUpdate < 10){
+					self.exit(SensorData.ERR_MESSAGE.REQUEST_INTERVAL_TOO_SHORT, 406);
+					return;
+				}
+				var result = SensorDataHelper.validSensorValue(data);
+				if(result.status){
+					self._insertValueDataPoint(data, sensor);
+				}else{
+					self.exit(result.message, result.statusCode);
+				}
+				break;
+			case Sensor.Type.SWITCHER:
+				break;
+			case Sensor.Type.GEN:
+				break;
+			case Sensor.Type.GPS:
+				break;
+			case Sensor.Type.PHOTO:
+				break;
+			case Sensor.Type.WEIBO:
 				break;
 		}
+	},
+
+	_insertValueDataPoint: function(data, sensor){
+		var self = this;
+		var insertData = {};
+		insertData.sensor_id = sensor.id;
+		insertData.data_timestamp = !!data.timestamp ? Math.round(Date.parse(data.timestamp) / 1000) : Math.round(new Date().getTime() / 1000);
+		insertData.data_value = parseFloat(data.value);
+		insertData.data_create_time = Math.round(new Date().getTime() / 1000);
+		insertData.sensor_status = 1;
+		Sensor.insert(insertData, function(result){
+			if(result){
+				//TODO: update sensor last update
+				self.exit("", 200);
+			}else{
+				self.exit("Server Error", 500);
+			}
+		});
 	}
 };
 oo.extend(SensorDataController, BaseController);

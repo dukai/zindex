@@ -68,7 +68,7 @@ DeviceController.prototype = {
 			if(row){
 				callback(row);
 			}else{
-				self.exit("API Key And Device Id NOT Match", 406);
+				self.exit(Device.ERR_MESSAGE.API_KEY_DEVICE_NOT_MATCH, 406);
 			}
 		});
     },

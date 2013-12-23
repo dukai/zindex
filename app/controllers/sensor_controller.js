@@ -1,5 +1,6 @@
 var BaseController = require('./base_controller'),
 	oo = require('mvc/lib/utils/oo'),
+	Device = require('../models/sensor'),
     Sensor = require('../models/sensor');
 var util = require('util');
 
@@ -77,7 +78,7 @@ SensorController.prototype = {
 				if(row){
 					callback(row);
 				}else{
-					self.exit("API Key And Device Id  Not Match or Sensor Id NOT Exits", 406);
+					self.exit(Device.ERR_MESSAGE.API_KEY_DEVICE_NOT_MATCH, 406);
 				}
 
 			})
@@ -86,7 +87,7 @@ SensorController.prototype = {
 				if(row){
 					callback(row);
 				}else{
-					self.exit("API Key And Device Id  Not Match or Sensor Id NOT Exits", 406);
+					self.exit(Sensor.ERR_MESSAGE.API_KEY_DEVICE_SENSOR_NOT_MATCH, 406);
 				}
 			});
 		}
