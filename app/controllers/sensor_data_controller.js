@@ -165,11 +165,16 @@ SensorDataController.prototype = {
 		insertData.sensor_status = 1;
 		SensorData.insertValueData(insertData, function(result){
 			if(result){
-				//TODO: update sensor last update
                 callback({
                     status: true,
                     statusCode: 200,
                     message: ""
+                });
+                Sensor.updateLastUpdateTime(sensor.id, now, function(result){
+                    console.log(result);
+                });
+                Device.updateLastUpdateTime(sensor.device_id, now, function(result){
+                    console.log(result);
                 });
 			}else{
                 callback({
