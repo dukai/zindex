@@ -36,7 +36,6 @@ SensorData.insertValueData = function(data, callback){
 
 SensorData.getValueData = function(timestamp, callback){
     var sql = "select * from yl_sensor_data where data_timestamp=" + timestamp + " limit 1";
-    console.log(sql);
     var db = AbstractModel.getDb();
     db.fetchRow(sql, function(err, row){
         callback(err, row);
