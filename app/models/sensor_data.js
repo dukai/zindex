@@ -23,7 +23,7 @@ oo.extend(SensorData, AbstractModel);
 
 
 
-SensorData.insert = function(data, callback){
+SensorData.insertValueData = function(data, callback){
     var db = AbstractModel.getDb();
     db.insert('yl_sensor_data', data, function(err, result){
         if(!err){
