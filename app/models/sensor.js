@@ -14,6 +14,20 @@ Sensor.prototype = {
 
 oo.extend(Sensor, AbstractModel);
 
+Sensor.exists = function(userLogin, deviceId, sensorId, callback){
+	var db = AbstractModel.getDb();
+
+	var sql = "select * from yl_sensors where user_login='" + userLogin + "' and device_id=" + deviceId + " and id=" + sensorId;
+	db.fetchRow(sql, function(err, result){
+		if(!err){
+			callback(result);
+		}else{
+			callback(false);
+		}
+	});
+}
+
+
 Sensor.Type = {
 	VALUE: 0,
 	SWITCHER: 5,
@@ -29,5 +43,7 @@ Sensor.DataType = {
 	GEN: 3,
 	BIN: 4
 };
+
+
 
 module.exports = Sensor;
