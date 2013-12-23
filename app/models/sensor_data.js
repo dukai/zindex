@@ -15,7 +15,8 @@ SensorData.ERR_MESSAGE = {
 	VALUE_FORMAT_INVALID: 'Value Format Incorrect.',
 	TIMESTAMP_FORMAT_INVALID: 'Timestamp format incorrect.',
 	LAT_OR_LNG_INVALID: 'lat or lng is invalid.',
-	DATA_FORMAT_INVALID: 'Data format incorrect.'
+	DATA_FORMAT_INVALID: 'Data format incorrect.',
+	REQUEST_INTERVAL_TOO_SHORT: "Request interval is too short (should > 10s)"
 };
 
 oo.extend(SensorData, AbstractModel);
