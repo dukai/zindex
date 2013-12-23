@@ -24,7 +24,7 @@ SensorDataController.prototype = {
         this.json("HELLO");
     },
 
-    datapointsAction: function(){
+	datapointsAction: function(){
         var self = this;
         var deviceId = this.getParam('device_id', 0);
         var sensorId = parseInt(this.getParam('sensor_id', 0));
@@ -65,8 +65,7 @@ SensorDataController.prototype = {
 		        if(row){
 			        callback(row);
 		        }else{
-			        self.statusCode = 406;
-			        self.json("API Key And Device Id  Not Match or Sensor Id NOT Exits");
+			        self.exit("API Key And Device Id  Not Match or Sensor Id NOT Exits", 406);
 		        }
 
 	        })
@@ -75,8 +74,7 @@ SensorDataController.prototype = {
 		        if(row){
 			        callback(row);
 		        }else{
-			        self.statusCode = 406;
-			        self.json("API Key And Device Id  Not Match or Sensor Id NOT Exits");
+			        self.exit("API Key And Device Id  Not Match or Sensor Id NOT Exits", 406);
 		        }
 	        });
         }
