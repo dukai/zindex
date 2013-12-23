@@ -16,8 +16,7 @@ BaseController.prototype = {
         var user = new User();
         user.existsByAPIKey(this._getAPIKey(), function(status, row){
             if(!status){
-                self.response.writeHead(403);
-                self.response.end("U-ApiKey Incorrect")
+                self.exit("U-ApiKey Incorrect", 403);
             }else{
                 self.member = row;
                 dispatchActionCallback(true);
