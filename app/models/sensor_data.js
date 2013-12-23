@@ -18,6 +18,7 @@ SensorData.ERR_MESSAGE = {
 	TIMESTAMP_FORMAT_INVALID: 'Timestamp format incorrect.',
 	LAT_OR_LNG_INVALID: 'lat or lng is invalid.',
 	DATA_FORMAT_INVALID: 'Data format incorrect.',
+    KEY_INVALID: "Key Invalid",
 	REQUEST_INTERVAL_TOO_SHORT: "Request interval is too short (should > 10s)"
 };
 
@@ -32,5 +33,22 @@ SensorData.insertValueData = function(data, callback){
         err && console.log(err);
     });
 };
+
+SensorData.getValueData = function(timestamp, callback){
+    var sql = "select * from yl_sensor_data where data_timestamp=" + timestamp + " limit 1";
+    console.log(sql);
+    var db = AbstractModel.getDb();
+    db.fetchRow(sql, function(err, row){
+        callback(err, row);
+    });
+};
+
+SensorData.getLastValueData = function(callback){
+    var sql = "select * from yl_sensor_data order by data_timestamp desc limit 1";
+    var db = AbstractModel.getDb();
+    db.fetchRow(sql, function(err, row){
+        callback(err, row);
+    });
+}
 
 module.exports = SensorData;
