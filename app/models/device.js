@@ -25,7 +25,19 @@ Device.exists = function(userLogin, deviceId, callback){
 			callback(false);
 		}
 	});
-}
+};
+
+Device.updateLastUpdateTime = function(deviceId, timestamp, callback){
+    var db = AbstractModel.getDb();
+    timestamp = timestamp ? timestamp : Math.round(new Date().getTime() / 1000);
+    db.update('yl_devices', {device_last_data_update: timestamp}, {id: deviceId}, function(err, result){
+        if(!err){
+            callback(result);
+        }else{
+            console.log(err);
+        }
+    });
+};
 
 
 Device.ERR_MESSAGE = {

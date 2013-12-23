@@ -28,6 +28,18 @@ Sensor.exists = function(userLogin, deviceId, sensorId, callback){
 };
 
 
+Sensor.updateLastUpdateTime = function(sensorId, timestamp, callback){
+    var db = AbstractModel.getDb();
+    timestamp = timestamp ? timestamp : Math.round(new Date().getTime() / 1000);
+    db.update('yl_sensors', {sensor_last_update: timestamp}, {id: sensorId}, function(err, result){
+        if(!err){
+            callback(result);
+        }else{
+            console.log(err);
+        }
+    });
+}
+
 Sensor.ERR_MESSAGE = {
 	API_KEY_DEVICE_SENSOR_NOT_MATCH: 'API Key And Device Id  Not Match or Sensor Id NOT Exits'
 };
