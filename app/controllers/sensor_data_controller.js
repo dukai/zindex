@@ -129,7 +129,7 @@ SensorDataController.prototype = {
 		var now = Math.round(new Date().getTime() / 1000);
 		switch (sensor.sensor_type){
 			case Sensor.Type.VALUE:
-				var result = SensorDataHelper.validSensorValue(data);
+				var result = SensorDataHelper.validValueSensorData(data);
 				if(result.status){
 					self._insertValueDataPoint(data, sensor, callback);
 				}else{
@@ -137,6 +137,7 @@ SensorDataController.prototype = {
 				}
 				break;
 			case Sensor.Type.SWITCHER:
+
 				break;
 			case Sensor.Type.GEN:
 				break;

@@ -2,7 +2,7 @@ var SensorData = require('../models/sensor_data');
 
 var SensorDataHelper = {
 
-	validSensorValue: function(data){
+	validValueSensorData: function(data){
 		if(!parseFloat(data.value)){
 			return {
 				status: false,
