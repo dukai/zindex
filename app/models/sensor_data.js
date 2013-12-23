@@ -21,4 +21,17 @@ SensorData.ERR_MESSAGE = {
 
 oo.extend(SensorData, AbstractModel);
 
+
+
+SensorData.insert = function(data, callback){
+    var db = AbstractModel.getDb();
+    db.insert('yl_sensor_data', data, function(err, result){
+        if(!err){
+            callback(result);
+        }else{
+            callback(false);
+        }
+    });
+};
+
 module.exports = SensorData;
