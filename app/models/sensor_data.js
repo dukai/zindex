@@ -1,5 +1,7 @@
 var AbstractModel = require('mvc/lib/abstract_model'),
-	oo = require('mvc/lib/utils/oo');
+	oo = require('mvc/lib/utils/oo'),
+    Sensor = require('./sensor'),
+    Device = require('./device');
 
 var SensorData = function(options){
 	this._initSensorData(options);
@@ -30,6 +32,7 @@ SensorData.insertValueData = function(data, callback){
             callback(result);
         }else{
             callback(false);
+            console.log(err);
         }
     });
 };
