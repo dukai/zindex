@@ -91,7 +91,6 @@ SensorDataController.prototype = {
                 var data = JSON.parse(data);
                 if(data.constructor === Array){
                     //TODO: 添加单个设备数据点，需增加类型判断
-
 	                for(var i in data){
 		                self._addSingleDataPoint(data[i], sensor);
 	                }
@@ -140,12 +139,13 @@ SensorDataController.prototype = {
 	_insertValueDataPoint: function(data, sensor){
 		var self = this;
 		var insertData = {};
+        var now = Math.round(new Date().getTime() / 1000);
 		insertData.sensor_id = sensor.id;
-		insertData.data_timestamp = !!data.timestamp ? Math.round(Date.parse(data.timestamp) / 1000) : Math.round(new Date().getTime() / 1000);
+		insertData.data_timestamp = !!data.timestamp ? Math.round(Date.parse(data.timestamp) / 1000) : now;
 		insertData.data_value = parseFloat(data.value);
-		insertData.data_create_time = Math.round(new Date().getTime() / 1000);
+		insertData.data_create_time = now;
 		insertData.sensor_status = 1;
-		Sensor.insert(insertData, function(result){
+		Sensor.insertValueData(insertData, function(result){
 			if(result){
 				//TODO: update sensor last update
 				self.exit("", 200);
