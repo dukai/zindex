@@ -34,8 +34,17 @@ var r5 = new route.Route({
 });
 
 
-console.log(r5.match('/v1.1/device/1424525/sensor/22424/datapoints'));
+var r6 = new route.Route({
+    url: '/v1.1/device/{device_id}/sensor/{sensor_id}/datapoint/{key}',
+    module: 'api',
+    controller: 'sensor-data',
+    action: 'single-point'
+});
+
+console.log(r6.match('/v1.1/device/1424525/sensor/22424/datapoint'));
+console.log(r6.match('/v1.1/device/1424525/sensor/22424/datapoint/324343'));
 /*
+console.log(r5.match('/v1.1/device/1424525/sensor/22424/datapoints'));
 console.log(r.match("/v1.1/device/1221/sensor/2312.json"));
 console.log(r.match('/v1.1/device/2440/sensor/3243'));
 console.log(r3.match('/'));
