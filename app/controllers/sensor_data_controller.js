@@ -35,8 +35,8 @@ SensorDataController.prototype = {
                 case 'post':
                     self._createDataPoint(sensorId, sensor);
                     break;
-                case 'put':
-                    self._editDevice(deviceId);
+                case 'get':
+                    self._listDataPoint(sensorId);
                     break;
                 case 'delete':
                     self._deleteDevice(deviceId);
@@ -83,19 +83,37 @@ SensorDataController.prototype = {
     _createDataPoint: function(sensorId, sensor){
         var self = this;
         var db = this.getDb();
-
+        var now = Math.round(new Date().getTime() / 1000);
 	    var sensorLastUpdate = sensor.sensor_last_update;
+        if(sensor.sensor_type == Sensor.Type.VALUE && now - sensorLastUpdate < 10){
+            self.exit(SensorData.ERR_MESSAGE.REQUEST_INTERVAL_TOO_SHORT, 406);
+            return;
+        }
 
         this.getRawPost(function(err, data){
             try{
                 var data = JSON.parse(data);
                 if(data.constructor === Array){
                     //TODO: 添加单个设备数据点，需增加类型判断
+                    var dataLength = data.length;
+                    var successLength = 0;
 	                for(var i in data){
-		                self._addSingleDataPoint(data[i], sensor);
+		                self._addSingleDataPoint(data[i], sensor, function(result){
+                            if(result.status){
+                                successLength++;
+                            }else{
+                                console.log(result);
+                            }
+                            dataLength --;
+                            if(dataLength == 0){
+                                self.exit(successLength.toString());
+                            }
+                        });
 	                }
                 }else if(data.constructor === Object){
-	                self._addSingleDataPoint(data, sensor);
+	                self._addSingleDataPoint(data, sensor, function(result){
+                        self.exit(result.message, result.statusCode);
+                    });
                 }
 
             }catch (e){
@@ -106,21 +124,16 @@ SensorDataController.prototype = {
         });
     },
 
-	_addSingleDataPoint: function(data, sensor){
+	_addSingleDataPoint: function(data, sensor, callback){
 		var self = this;
 		var now = Math.round(new Date().getTime() / 1000);
 		switch (sensor.sensor_type){
 			case Sensor.Type.VALUE:
-				var lastUpdate = sensor.sensor_last_update;
-				if(now - lastUpdate < 10){
-					self.exit(SensorData.ERR_MESSAGE.REQUEST_INTERVAL_TOO_SHORT, 406);
-					return;
-				}
 				var result = SensorDataHelper.validSensorValue(data);
 				if(result.status){
-					self._insertValueDataPoint(data, sensor);
+					self._insertValueDataPoint(data, sensor, callback);
 				}else{
-					self.exit(result.message, result.statusCode);
+					callback(result);
 				}
 				break;
 			case Sensor.Type.SWITCHER:
@@ -135,8 +148,13 @@ SensorDataController.prototype = {
 				break;
 		}
 	},
-
-	_insertValueDataPoint: function(data, sensor){
+    /**
+     * 插入数值型数据节点
+     * @param data
+     * @param sensor
+     * @private
+     */
+	_insertValueDataPoint: function(data, sensor, callback){
 		var self = this;
 		var insertData = {};
         var now = Math.round(new Date().getTime() / 1000);
@@ -145,15 +163,36 @@ SensorDataController.prototype = {
 		insertData.data_value = parseFloat(data.value);
 		insertData.data_create_time = now;
 		insertData.sensor_status = 1;
-		Sensor.insertValueData(insertData, function(result){
+		SensorData.insertValueData(insertData, function(result){
 			if(result){
 				//TODO: update sensor last update
-				self.exit("", 200);
+                callback({
+                    status: true,
+                    statusCode: 200,
+                    message: ""
+                });
 			}else{
-				self.exit("Server Error", 500);
+                callback({
+                    status: false,
+                    statusCode: 500,
+                    message: "Server Error"
+                });
 			}
 		});
-	}
+	},
+
+    /**
+     * 数据节点列表
+     * @param sensorId
+     * @private
+     */
+    _listDataPoint: function(sensorId){
+        var self = this;
+        var sql = "select * from yl_sensor_data where sensor_id=" + sensorId + " order by data_timestamp desc limit 10";
+        this.getDb().fetchAll(sql, function(err, results){
+            self.json(results);
+        });
+    }
 };
 oo.extend(SensorDataController, BaseController);
 
