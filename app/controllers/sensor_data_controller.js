@@ -48,6 +48,27 @@ SensorDataController.prototype = {
         });
     },
 
+    singlePointAction: function(){
+        var self = this;
+        var deviceId = this.getParam('device_id', 0);
+        var sensorId = parseInt(this.getParam('sensor_id', 0));
+        var dataKey = this.getParam('key', '');
+
+        this._checkPermission(deviceId, sensorId, function(sensor){
+            switch (self._getMethod()){
+                case 'post':
+                    break;
+                case 'get':
+                    self._getDataPoint(dataKey, sensor);
+                    break;
+                case 'delete':
+                    break;
+                default :
+                    break;
+            }
+        });
+    },
+
     /**
      * 检查设备ID与用户信息是否相符
      * @param deviceId
@@ -198,6 +219,55 @@ SensorDataController.prototype = {
         this.getDb().fetchAll(sql, function(err, results){
             self.json(results);
         });
+    },
+    /**
+     * 获取指定的数据点
+     * @param dataKey
+     * @param sensor
+     * @private
+     */
+    _getDataPoint: function(dataKey, sensor){
+        var self = this;
+        var now = Math.round(new Date().getTime() / 1000);
+        switch (sensor.sensor_type){
+            case Sensor.Type.VALUE:
+
+                if(dataKey == ''){
+                    SensorData.getLastValueData(function(err, row){
+                        !err && self.json(row);
+                    });
+                }else{
+                    var timestamp = Date.parse(dataKey);
+                    if(timestamp){
+                        SensorData.getValueData(Math.round(timestamp/1000), function(err, row){
+                            if(!err){
+                                if(row){
+                                    self.json(row);
+                                }else{
+                                    self.exit(SensorData.ERR_MESSAGE.KEY_INVALID, 406);
+                                }
+                            }else{
+                                self.exit(err.code, 406);
+                            }
+                        });
+                    }else{
+                        self.exit(SensorData.ERR_MESSAGE.TIMESTAMP_FORMAT_INVALID, 406);
+                    }
+
+                }
+                break;
+            case Sensor.Type.SWITCHER:
+
+                break;
+            case Sensor.Type.GEN:
+                break;
+            case Sensor.Type.GPS:
+                break;
+            case Sensor.Type.PHOTO:
+                break;
+            case Sensor.Type.WEIBO:
+                break;
+        }
     }
 };
 oo.extend(SensorDataController, BaseController);
