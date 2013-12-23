@@ -163,8 +163,8 @@ SensorDataController.prototype = {
 		insertData.data_value = parseFloat(data.value);
 		insertData.data_create_time = now;
 		insertData.sensor_status = 1;
-		SensorData.insertValueData(insertData, function(result){
-			if(result){
+		SensorData.insertValueData(insertData, function(err, result){
+			if(!err){
                 callback({
                     status: true,
                     statusCode: 200,
@@ -179,8 +179,8 @@ SensorDataController.prototype = {
 			}else{
                 callback({
                     status: false,
-                    statusCode: 500,
-                    message: "Server Error"
+                    statusCode: 406,
+                    message: err.code
                 });
 			}
 		});
