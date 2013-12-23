@@ -6,7 +6,7 @@ var Device = function(){
 	this._initDevice();
 };
 
-Sensor.prototype = {
+Device.prototype = {
 	_initDevice: function(){
 		AbstractModel.call(this);
 	}
