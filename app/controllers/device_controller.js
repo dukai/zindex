@@ -98,11 +98,11 @@ DeviceController.prototype = {
                     'device_status':1
                 };
                  db.insert('yl_devices', device, function(err, result) {
-                 self.json(JSON.stringify(result.insertId));
+                 self.json((result.insertId));
                  });
 
             }catch (e){
-                self.json(JSON.stringify('JSON字符串内容不规范'));
+                self.json(('JSON字符串内容不规范'));
             }
 
 
@@ -113,7 +113,7 @@ DeviceController.prototype = {
         var db = this.getDb();
 		var sql = "select * from yl_devices where user_login='" + this.member.user_login + "' limit 20";
         db.fetchAll(sql, function(err, rows, fields) {
-            self.json(JSON.stringify(rows));
+            self.json(rows);
         });
 	},
 
@@ -121,7 +121,7 @@ DeviceController.prototype = {
 		var self = this;
 		this.getDb().fetchRow("select * from yl_devices where id=" + deviceId, function(err, row){
             //TODO: format data
-			self.json(JSON.stringify(row));
+			self.json(row);
 		});
 	},
 	_editDevice: function(deviceId){
@@ -154,12 +154,12 @@ DeviceController.prototype = {
                 }
 
                 db.update('yl_devices', device, {id: deviceId}, function(err, result) {
-                    self.json(JSON.stringify(1));
+                    self.json(1);
                 });
 
             }catch (e){
                 console.log(e);
-                self.json(JSON.stringify('JSON字符串内容不规范'));
+                self.json('JSON字符串内容不规范');
             }
 
 

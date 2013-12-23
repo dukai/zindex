@@ -135,13 +135,13 @@ SensorController.prototype = {
 				    var insertId = result.insertId;
 				    var updateSql = "update yl_devices set sensor_amount=sensor_amount+1 where id=" + deviceId;
 				    db.query(updateSql, function(err, result){
-					    self.json(JSON.stringify(insertId));
+					    self.json(insertId);
 				    });
 			    });
 
 		    }catch (e){
                 self.statusCode = 406;
-			    self.json(JSON.stringify('JSON字符串内容不规范'));
+			    self.json('JSON字符串内容不规范');
 		    }
 
 
@@ -177,7 +177,7 @@ SensorController.prototype = {
 				result.push(sensor);
 			}
 
-			self.json(JSON.stringify(result));
+			self.json(result);
 		});
     },
     /**
@@ -199,7 +199,7 @@ SensorController.prototype = {
 	        sensorResult.unit_symbol = sensor.sensor_unit_symbol;
 	        sensorResult.last_data = sensor.sensor_last_data;
         }
-		this.json(JSON.stringify(sensorResult));
+		this.json(sensorResult);
 	},
     /**
      * 编辑传感器信息
@@ -236,12 +236,12 @@ SensorController.prototype = {
                 }
 
                 db.update('yl_sensors', sensor, {id: sensorId}, function(err, result) {
-                    self.json(JSON.stringify(1));
+                    self.json(1);
                 });
 
             }catch (e){
                 self.statusCode = 406;
-                self.json(JSON.stringify('JSON字符串内容不规范'));
+                self.json('JSON字符串内容不规范');
             }
 
 
@@ -265,7 +265,7 @@ SensorController.prototype = {
         db.query(sql, function(err, row){
 
 	        db.query(updateDeviceSql, function(err, result){
-		        self.json(JSON.stringify(1));
+		        self.json(1);
 		        db.query(deleteTriggerSql, function(err, result){
 			        self._deleteData(sensorId, sensorType);
 		        });
