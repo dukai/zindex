@@ -208,7 +208,6 @@ SensorController.prototype = {
 	},
     /**
      * 编辑传感器信息
-     * @param deviceId
      * @param sensorId
      * @private
      */
