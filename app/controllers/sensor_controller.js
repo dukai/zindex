@@ -1,6 +1,6 @@
 var BaseController = require('./base_controller'),
 	oo = require('mvc/lib/utils/oo'),
-	Device = require('../models/sensor'),
+	Device = require('../models/device'),
     Sensor = require('../models/sensor');
 var util = require('util');
 
