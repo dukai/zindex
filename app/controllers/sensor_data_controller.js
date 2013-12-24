@@ -159,6 +159,12 @@ SensorDataController.prototype = {
 				break;
 			case Sensor.Type.SWITCHER:
 
+				var result = SensorDataHelper.validSwitcherSensorData(data);
+				if(result.status){
+					self._insertSwitcherDataPoint(data, sensor, callback);
+				}else{
+					callback(result);
+				}
 				break;
 			case Sensor.Type.GEN:
 				break;
@@ -170,10 +176,11 @@ SensorDataController.prototype = {
 				break;
 		}
 	},
-    /**
+    /**s
      * 插入数值型数据节点
      * @param data
      * @param sensor
+     * @param callback
      * @private
      */
 	_insertValueDataPoint: function(data, sensor, callback){
@@ -206,6 +213,49 @@ SensorDataController.prototype = {
                 });
 			}
 		});
+	},
+
+	/**s
+	 * 插入数值型数据节点
+	 * @param data
+	 * @param sensor
+	 * @param callback
+	 * @private
+	 */
+	_insertSwitcherDataPoint: function(data, sensor, callback){
+		var self = this;
+		var insertData = {};
+		var now = Math.round(new Date().getTime() / 1000);
+		insertData.sensor_id = sensor.id;
+		insertData.data_timestamp = now;
+		insertData.data_value = parseInt(data.value);
+		insertData.data_create_time = now;
+		insertData.sensor_status = 1;
+		SensorData.insertValueData(insertData, function(err, result){
+			if(!err){
+				callback({
+					status: true,
+					statusCode: 200,
+					message: ""
+				});
+				Sensor.updateLastUpdateTime(sensor.id, now, function(result){
+					console.log(result);
+				});
+				Device.updateLastUpdateTime(sensor.device_id, now, function(result){
+					console.log(result);
+				});
+			}else{
+				callback({
+					status: false,
+					statusCode: 406,
+					message: err.code
+				});
+			}
+		});
+	},
+
+	_insertValueData: function(data, callback){
+
 	},
 
     /**
