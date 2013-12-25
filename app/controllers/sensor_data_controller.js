@@ -38,9 +38,6 @@ SensorDataController.prototype = {
                 case 'get':
                     self._listDataPoint(sensorId);
                     break;
-                case 'delete':
-                    self._deleteDevice(deviceId);
-                    break;
                 default :
                     self._undefinedAction();
                     break;
@@ -57,13 +54,16 @@ SensorDataController.prototype = {
         this._checkPermission(deviceId, sensorId, function(sensor){
             switch (self._getMethod()){
                 case 'post':
+                    self._undefinedAction();
                     break;
                 case 'get':
                     self._getDataPoint(dataKey, sensor);
                     break;
                 case 'delete':
+                    self._undefinedAction();
                     break;
                 default :
+                    self._undefinedAction();
                     break;
             }
         });
@@ -123,7 +123,7 @@ SensorDataController.prototype = {
                             if(result.status){
                                 successLength++;
                             }else{
-                                console.log(result);
+                                console.log("add single data point:" + result);
                             }
                             dataLength --;
                             if(dataLength == 0){
@@ -199,7 +199,7 @@ SensorDataController.prototype = {
                     statusCode: 200,
                     message: ""
                 });
-                Sensor.updateLastUpdateTime(sensor.id, now, function(result){
+                Sensor.update(sensor.id, {sensor_last_update: now, sensor_last_data: insertData.data_value}, function(result){
                     console.log(result);
                 });
                 Device.updateLastUpdateTime(sensor.device_id, now, function(result){
@@ -283,13 +283,13 @@ SensorDataController.prototype = {
             case Sensor.Type.VALUE:
 
                 if(dataKey == ''){
-                    SensorData.getLastValueData(function(err, row){
+                    SensorData.getLastValueData(sensor.id, function(err, row){
                         !err && self.json(row);
                     });
                 }else{
                     var timestamp = Date.parse(dataKey);
                     if(timestamp){
-                        SensorData.getValueData(Math.round(timestamp/1000), function(err, row){
+                        SensorData.getValueData(sensor.id, Math.round(timestamp/1000), function(err, row){
                             if(!err){
                                 if(row){
                                     self.json(row);
@@ -307,7 +307,29 @@ SensorDataController.prototype = {
                 }
                 break;
             case Sensor.Type.SWITCHER:
+                if(dataKey == ''){
+                    SensorData.getLastValueData(sensor.id, function(err, row){
+                        !err && self.json(row);
+                    });
+                }else{
+                    var timestamp = Date.parse(dataKey);
+                    if(timestamp){
+                        SensorData.getValueData(sensor.id, Math.round(timestamp/1000), function(err, row){
+                            if(!err){
+                                if(row){
+                                    self.json(row);
+                                }else{
+                                    self.exit(SensorData.ERR_MESSAGE.KEY_INVALID, 406);
+                                }
+                            }else{
+                                self.exit(err.code, 406);
+                            }
+                        });
+                    }else{
+                        self.exit(SensorData.ERR_MESSAGE.TIMESTAMP_FORMAT_INVALID, 406);
+                    }
 
+                }
                 break;
             case Sensor.Type.GEN:
                 break;
