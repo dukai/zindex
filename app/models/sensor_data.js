@@ -34,16 +34,16 @@ SensorData.insertValueData = function(data, callback){
     });
 };
 
-SensorData.getValueData = function(timestamp, callback){
-    var sql = "select * from yl_sensor_data where data_timestamp=" + timestamp + " limit 1";
+SensorData.getValueData = function(sensorId, timestamp, callback){
+    var sql = "select * from yl_sensor_data where sensor_id=" + sensorId + " data_timestamp=" + timestamp + " limit 1";
     var db = AbstractModel.getDb();
     db.fetchRow(sql, function(err, row){
         callback(err, row);
     });
 };
 
-SensorData.getLastValueData = function(callback){
-    var sql = "select * from yl_sensor_data order by data_timestamp desc limit 1";
+SensorData.getLastValueData = function(sensorId, callback){
+    var sql = "select * from yl_sensor_data where sensor_id=" + sensorId + " order by data_timestamp desc limit 1";
     var db = AbstractModel.getDb();
     db.fetchRow(sql, function(err, row){
         callback(err, row);
