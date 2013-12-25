@@ -111,8 +111,7 @@ SensorController.prototype = {
 			    }
 
 			    if( SensorController.SENSOR_DATA_TYPE[data.type] === undefined || SensorController.SENSOR_TYPE[data.type] === undefined){
-				    self.statusCode = 406;
-				    self.json("Fail to create sensor,please check the data format.");
+				    self.exit("Fail to create sensor,please check the data format.", 406);
 				    return;
 			    }
 
@@ -301,6 +300,7 @@ SensorController.prototype = {
 
 SensorController.SENSOR_DATA_TYPE = {
 	value: Sensor.DataType.VALUE,
+    switcher: Sensor.DataType.VALUE,
 	gps: Sensor.DataType.GEN,
 	gen: Sensor.DataType.GEN,
 	photo: Sensor.DataType.BIN
@@ -308,6 +308,7 @@ SensorController.SENSOR_DATA_TYPE = {
 
 SensorController.SENSOR_TYPE = {
 	value: Sensor.Type.VALUE,
+    switcher: Sensor.Type.SWITCHER,
 	gps: Sensor.Type.GPS,
 	gen: Sensor.Type.GEN,
 	photo: Sensor.Type.PHOTO
