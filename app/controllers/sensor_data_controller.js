@@ -238,9 +238,9 @@ SensorDataController.prototype = {
 					statusCode: 200,
 					message: ""
 				});
-				Sensor.updateLastUpdateTime(sensor.id, now, function(result){
-					console.log(result);
-				});
+                Sensor.update(sensor.id, {sensor_last_update: now, sensor_last_data: insertData.data_value}, function(result){
+                    console.log(result);
+                });
 				Device.updateLastUpdateTime(sensor.device_id, now, function(result){
 					console.log(result);
 				});
