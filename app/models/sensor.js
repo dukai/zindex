@@ -40,6 +40,17 @@ Sensor.updateLastUpdateTime = function(sensorId, timestamp, callback){
     });
 }
 
+Sensor.update = function(sensorId, data, callback){
+    var db = AbstractModel.getDb();
+    db.update('yl_sensors', data, {id: sensorId}, function(err, result){
+        if(!err){
+            callback(result);
+        }else{
+            console.log(err);
+        }
+    });
+}
+
 Sensor.ERR_MESSAGE = {
 	API_KEY_DEVICE_SENSOR_NOT_MATCH: 'API Key And Device Id  Not Match or Sensor Id NOT Exits'
 };
