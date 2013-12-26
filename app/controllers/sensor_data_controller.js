@@ -100,13 +100,19 @@ SensorDataController.prototype = {
         }
 
     },
-
+	/**
+	 * 创建数据节点
+	 * @param sensorId
+	 * @param sensor
+	 * @private
+	 */
     _createDataPoint: function(sensorId, sensor){
         var self = this;
         var db = this.getDb();
         var now = Math.round(new Date().getTime() / 1000);
 	    var sensorLastUpdate = sensor.sensor_last_update;
-        if(sensor.sensor_type == Sensor.Type.VALUE && now - sensorLastUpdate < 10){
+		var sensorType = sensor.sensor_type;
+        if((sensorType == Sensor.Type.VALUE || sensorType == Sensor.Type.GEN || sensorType == Sensor.Type.GPS || sensorType == Sensor.Type.PHOTO) && now - sensorLastUpdate < 10){
             self.exit(SensorData.ERR_MESSAGE.REQUEST_INTERVAL_TOO_SHORT, 406);
             return;
         }
@@ -115,7 +121,7 @@ SensorDataController.prototype = {
             try{
                 var data = JSON.parse(data);
                 if(data.constructor === Array){
-                    //TODO: 添加单个设备数据点，需增加类型判断
+	                //添加多个数据点
                     var dataLength = data.length;
                     var successLength = 0;
 	                for(var i in data){
@@ -132,6 +138,7 @@ SensorDataController.prototype = {
                         });
 	                }
                 }else if(data.constructor === Object){
+	                //添加单个数据点
 	                self._addSingleDataPoint(data, sensor, function(result){
                         self.exit(result.message, result.statusCode);
                     });
@@ -144,7 +151,13 @@ SensorDataController.prototype = {
             }
         });
     },
-
+	/**
+	 * 添加单个数据点
+	 * @param data
+	 * @param sensor
+	 * @param callback
+	 * @private
+	 */
 	_addSingleDataPoint: function(data, sensor, callback){
 		var self = this;
 		var now = Math.round(new Date().getTime() / 1000);
@@ -153,6 +166,7 @@ SensorDataController.prototype = {
 				var result = SensorDataHelper.validValueSensorData(data);
 				if(result.status){
 					self._insertValueDataPoint(data, sensor, callback);
+					//TODO: should add trigger
 				}else{
 					callback(result);
 				}
