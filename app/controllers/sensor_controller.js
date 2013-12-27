@@ -146,6 +146,7 @@ SensorController.prototype = {
 		    }catch (e){
                 self.statusCode = 406;
 			    self.json('JSON字符串内容不规范');
+			    console.log(e);
 		    }
 
 
