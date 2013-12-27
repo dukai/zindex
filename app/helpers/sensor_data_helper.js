@@ -37,11 +37,19 @@ var SensorDataHelper = {
 			};
 		}
 
+		if(!!data.timestamp && !Date.parse(data.timestamp)){
+			return {
+				status: false,
+				message: SensorData.ERR_MESSAGE.TIMESTAMP_FORMAT_INVALID,
+				statusCode: 406
+			};
+		}
+
 		return {status: true};
 	},
 
 	validGenSensorData: function(data){
-		if(!data.value || data.value.toSource().length > 1024){
+		if(!data.value || JSON.stringify(data.value).length > 1024){
 			return {
 				status: false,
 				message: SensorData.ERR_MESSAGE.VALUE_FORMAT_INVALID,
@@ -57,14 +65,22 @@ var SensorDataHelper = {
 			};
 		}
 
+		if(!!data.timestamp && !Date.parse(data.timestamp)){
+			return {
+				status: false,
+				message: SensorData.ERR_MESSAGE.TIMESTAMP_FORMAT_INVALID,
+				statusCode: 406
+			};
+		}
+
 		return {status: true};
 
 	},
 
 	validGPSSensorData: function(data){
-		var genResult = this.validGenSensorData(data).status
+		data.key = data.timestamp ? data.timestamp : Math.round(new Date().getTime() / 1000);
+		var genResult = this.validGenSensorData(data);
 		if(genResult.status){
-
 			if(data.value.constructor !== Object){
 				return {
 					status: false,
@@ -73,9 +89,45 @@ var SensorDataHelper = {
 				};
 			}
 
-			if(!(data.value.lat && data.value.lng) && !(data.value.lat_dd && data.value.lng_ddd) && !(data.value.lat_ddmm && data.value.lng_dddmm)){
-
+			if(!(data.value.lat !== undefined && data.value.lng !== undefined)
+					&& !(data.value.lat_dd !== undefined && data.value.lng_ddd !== undefined)
+					&& !(data.value.lat_ddmm !== undefined && data.value.lng_dddmm !== undefined)){
+				return {
+					status: false,
+					message: SensorData.ERR_MESSAGE.VALUE_FORMAT_INVALID,
+					statusCode: 406
+				};
 			}
+
+
+			if(data.value.lat !== undefined && data.value.lng !== undefined
+					&& (Math.abs(parseFloat(data.value.lat)) > 90 || Math.abs(parseFloat(data.value.lng)) > 180)) {
+				return {
+					status: false,
+					message: SensorData.ERR_MESSAGE.LAT_OR_LNG_INVALID,
+					statusCode: 406
+				}
+			}
+
+			if(data.value.lat_dd !== undefined && data.value.lng_ddd !== undefined
+				&& (Math.abs(parseFloat(data.value.lat_dd)) > 90 || Math.abs(parseFloat(data.value.lng_ddd)) > 180)) {
+				return {
+					status: false,
+					message: SensorData.ERR_MESSAGE.LAT_OR_LNG_INVALID,
+					statusCode: 406
+				}
+			}
+
+			if(data.value.lat_ddmm !== undefined && data.value.lng_dddmm !== undefined
+				&& (Math.abs(parseFloat(data.value.lat_ddmm)) > 9060 || Math.abs(parseFloat(data.value.lng_dddmm)) > 18060)) {
+				return {
+					status: false,
+					message: SensorData.ERR_MESSAGE.LAT_OR_LNG_INVALID,
+					statusCode: 406
+				}
+			}
+
+			return {status:true};
 
 
 		}else{
