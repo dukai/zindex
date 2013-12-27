@@ -34,6 +34,14 @@ SensorData.insertValueData = function(data, callback){
     });
 };
 
+SensorData.insertGenData = function(data, callback){
+	var db = AbstractModel.getDb();
+	db.insert('yl_sensor_data_gen', data, function(err, result){
+		callback(err, result);
+		err && console.log(err);
+	});
+}
+
 SensorData.getValueData = function(sensorId, timestamp, callback){
     var sql = "select * from yl_sensor_data where sensor_id=" + sensorId + " data_timestamp=" + timestamp + " limit 1";
     var db = AbstractModel.getDb();
