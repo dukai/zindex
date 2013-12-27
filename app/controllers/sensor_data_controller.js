@@ -36,7 +36,7 @@ SensorDataController.prototype = {
                     self._createDataPoint(sensorId, sensor);
                     break;
                 case 'get':
-                    self._listDataPoint(sensorId);
+                    self._listDataPoint(sensorId, sensor);
                     break;
                 default :
                     self._undefinedAction();
@@ -181,8 +181,20 @@ SensorDataController.prototype = {
 				}
 				break;
 			case Sensor.Type.GEN:
+				var result = SensorDataHelper.validGenSensorData(data);
+				if(result.status){
+					self._insertGenDataPoint(data, sensor, callback);
+				}else{
+					callback(result);
+				}
 				break;
 			case Sensor.Type.GPS:
+				var result = SensorDataHelper.validGPSSensorData(data);
+				if(result.status){
+					self._insertGPSDataPoint(data, sensor, callback);
+				}else{
+					callback(result);
+				}
 				break;
 			case Sensor.Type.PHOTO:
 				break;
@@ -272,14 +284,71 @@ SensorDataController.prototype = {
 
 	},
 
+	_insertGenDataPoint: function(data, sensor, callback){
+		var self = this;
+		var insertData = {};
+		var now = Math.round(new Date().getTime() / 1000);
+
+		insertData.sensor_id = sensor.id;
+		insertData.data_key = data.key;
+		insertData.data_value = JSON.stringify(data.value);
+		insertData.data_create_time = now;
+		SensorData.insertGenData(insertData, function(err, result){
+			if(!err){
+				callback({
+					status: true,
+					statusCode: 200,
+					message: ''
+				});
+
+				Sensor.update(sensor.id, {sensor_last_update: now, sensor_last_data_gen: insertData.value}, function(result){
+
+				});
+
+				Device.updateLastUpdateTime(sensor.device_id, now, function(result){
+
+				});
+			}else{
+				callback({
+					status: false,
+					statusCode: 406,
+					message: err.code
+				});
+			}
+		});
+	},
+
+	_insertGPSDataPoint: function(data, sensor, callback){
+		if(data.value.offset){
+			this._earth2MarsByCoordination(data);
+		}
+
+		this._insertGenDataPoint(data, sensor, callback);
+	},
+
+	_earth2MarsByCoordination: function(data){
+
+	},
+
+
     /**
      * 数据节点列表
      * @param sensorId
+     * @param sensor
      * @private
      */
-    _listDataPoint: function(sensorId){
+    _listDataPoint: function(sensorId, sensor){
         var self = this;
-        var sql = "select * from yl_sensor_data where sensor_id=" + sensorId + " order by data_timestamp desc limit 10";
+	    var tableName = "";
+	    if(sensor.sensor_type == Sensor.Type.VALUE || sensor.sensor_type == Sensor.Type.SWITCHER){
+		    tableName = "yl_sensor_data";
+	    }
+
+	    if(sensor.sensor_type == Sensor.Type.GEN || sensor.sensor_type == Sensor.Type.GPS){
+		    tableName = "yl_sensor_data_gen";
+	    }
+        var sql = "select * from " + tableName + " where sensor_id=" + sensorId + " order by data_create_time desc limit 10";
+	    console.log(sql);
         this.getDb().fetchAll(sql, function(err, results){
             self.json(results);
         });
