@@ -20,7 +20,8 @@ SensorData.ERR_MESSAGE = {
 	DATA_FORMAT_INVALID: 'Data format incorrect.',
     KEY_INVALID: "Key Invalid",
 	REQUEST_INTERVAL_TOO_SHORT: "Request interval is too short (should > 10s)",
-	MYSQL_ERROR: "Mysql Error: "
+	MYSQL_ERROR: "Mysql Error: ",
+    SENSOR_TYPE_INVALID: "Sensor Type Invalid"
 };
 
 oo.extend(SensorData, AbstractModel);
