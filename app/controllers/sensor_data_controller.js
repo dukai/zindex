@@ -456,9 +456,10 @@ SensorDataController.prototype = {
 
 	            }
                 break;
-            case Sensor.Type.PHOTO:
-                break;
             case Sensor.Type.WEIBO:
+                break;
+            default :
+                self.exit(SensorData.ERR_MESSAGE.SENSOR_TYPE_INVALID, 406);
                 break;
         }
     }
