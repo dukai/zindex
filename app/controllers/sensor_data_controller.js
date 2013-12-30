@@ -69,6 +69,44 @@ SensorDataController.prototype = {
         });
     },
 
+    photoAction: function(){
+        var self = this;
+        var deviceId = this.getParam('device_id', 0);
+        var sensorId = parseInt(this.getParam('sensor_id', 0));
+
+        this._checkPermission(deviceId, sensorId, function(sensor){
+            switch (self._getMethod()){
+                case 'post':
+                    self._addPhoto(sensor);
+                    break;
+                case 'get':
+                    self._undefinedAction();
+                    break;
+                case 'delete':
+                    self._undefinedAction();
+                    break;
+                default :
+                    self._undefinedAction();
+                    break;
+            }
+        });
+    },
+
+    _addPhoto: function(sensor){
+        if(sensor.sensor_type !== Sensor.Type.PHOTO){
+            this.exit(SensorData.ERR_MESSAGE.SENSOR_TYPE_INVALID, 406);
+        }else{
+
+            this.getRawPost(function(err, data){
+                var fs = require('fs');
+                var appPath = require('mvc/lib/config').app_path;
+                fs.writeFile(appPath + "/temp.jpg", data);
+            });
+
+            this.exit("HELLO", 200);
+        }
+    },
+
     /**
      * 检查设备ID与用户信息是否相符
      * @param deviceId
