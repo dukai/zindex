@@ -69,6 +69,13 @@ exports.routes = [
 		action: 'single-point'
 	},
 
+    {
+        url: '/v1.1/device/{device_id}/sensor/{sensor_id}/photos',
+        module: 'api',
+        controller: 'sensor-data',
+        action: 'photo'
+    },
+
 	{
 		url: '/v1.1/user/api-key',
 		module: 'api',
