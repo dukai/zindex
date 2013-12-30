@@ -19,7 +19,8 @@ SensorData.ERR_MESSAGE = {
 	LAT_OR_LNG_INVALID: 'lat or lng is invalid.',
 	DATA_FORMAT_INVALID: 'Data format incorrect.',
     KEY_INVALID: "Key Invalid",
-	REQUEST_INTERVAL_TOO_SHORT: "Request interval is too short (should > 10s)"
+	REQUEST_INTERVAL_TOO_SHORT: "Request interval is too short (should > 10s)",
+	MYSQL_ERROR: "Mysql Error: "
 };
 
 oo.extend(SensorData, AbstractModel);
@@ -51,11 +52,33 @@ SensorData.getValueData = function(sensorId, timestamp, callback){
 };
 
 SensorData.getLastValueData = function(sensorId, callback){
-    var sql = "select * from yl_sensor_data where sensor_id=" + sensorId + " order by data_timestamp desc limit 1";
+    var sql = "select sensor_last_update as timestamp, sensor_last_data as value from yl_sensors where id=" + sensorId + " limit 1";
     var db = AbstractModel.getDb();
     db.fetchRow(sql, function(err, row){
         callback(err, row);
     });
+}
+
+SensorData.getLastGenData = function(sensorId, callback){
+	var sql = "select sensor_last_update as timestamp, sensor_last_data_gen as value  from yl_sensors where id=" + sensorId + " limit 1";
+	var db = AbstractModel.getDb();
+	db.fetchRow(sql, function(err, row){
+		if(row && row.value){
+			row.value = JSON.parse(row.value);
+		}
+		callback(err, row);
+	});
+};
+
+SensorData.getGenData = function(sensorId, key, callback){
+	var sql = "select data_value as value from yl_sensor_data_gen where sensor_id=" + sensorId + " and data_key='" + key + "' limit 1";
+	var db = AbstractModel.getDb();
+	db.fetchRow(sql, function(err, row){
+		if(row && row.value){
+			row.value = JSON.parse(row.value);
+		}
+		callback(err, row);
+	});
 }
 
 module.exports = SensorData;
