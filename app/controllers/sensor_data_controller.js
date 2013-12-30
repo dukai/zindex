@@ -145,9 +145,8 @@ SensorDataController.prototype = {
                 }
 
             }catch (e){
-	            throw e;
-                self.statusCode = 406;
-                self.json('JSON字符串内容不规范');
+	            require('mvc/utils').debug(e, "ERR");
+	            self.exit('JSON字符串内容不规范', 406);
             }
         });
     },
@@ -301,12 +300,12 @@ SensorDataController.prototype = {
 					message: ''
 				});
 
-				Sensor.update(sensor.id, {sensor_last_update: now, sensor_last_data_gen: insertData.value}, function(result){
-
+				Sensor.update(sensor.id, {sensor_last_update: now, sensor_last_data_gen: insertData.data_value}, function(result){
+					//console.log(result);
 				});
 
 				Device.updateLastUpdateTime(sensor.device_id, now, function(result){
-
+					//console.log(result);
 				});
 			}else{
 				callback({
@@ -348,7 +347,6 @@ SensorDataController.prototype = {
 		    tableName = "yl_sensor_data_gen";
 	    }
         var sql = "select * from " + tableName + " where sensor_id=" + sensorId + " order by data_create_time desc limit 10";
-	    console.log(sql);
         this.getDb().fetchAll(sql, function(err, results){
             self.json(results);
         });
@@ -415,8 +413,48 @@ SensorDataController.prototype = {
                 }
                 break;
             case Sensor.Type.GEN:
+	            if(dataKey == ''){
+		            SensorData.getLastGenData(sensor.id, function(err, result){
+			            !err && self.json(result);
+		            });
+	            }else{
+		            SensorData.getGenData(sensor.id, dataKey, function(err, result){
+			            if(!err){
+				            if(result){
+					            self.json(result);
+				            }else{
+					            self.exit(SensorData.ERR_MESSAGE.KEY_INVALID, 406);
+				            }
+			            }else{
+				            self.exit(err.code, 406);
+			            }
+		            });
+	            }
                 break;
             case Sensor.Type.GPS:
+	            if(dataKey == ''){
+		            SensorData.getLastGenData(sensor.id, function(err, result){
+			            !err && self.json(result);
+		            });
+	            }else{
+		            var timestamp = Date.parse(dataKey);
+		            if(timestamp){
+			            SensorData.getGenData(sensor.id, timestamp, function(err, result){
+				            if(!err){
+					            if(result){
+						            self.json(result);
+					            }else{
+						            self.exit(SensorData.ERR_MESSAGE.KEY_INVALID, 406);
+					            }
+				            }else{
+					            self.exit(err.code, 406);
+				            }
+			            });
+		            }else{
+			            self.exit(SensorData.ERR_MESSAGE.TIMESTAMP_FORMAT_INVALID, 406);
+		            }
+
+	            }
                 break;
             case Sensor.Type.PHOTO:
                 break;
