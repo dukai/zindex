@@ -97,9 +97,10 @@ SensorDataController.prototype = {
             this.exit(SensorData.ERR_MESSAGE.SENSOR_TYPE_INVALID, 406);
         }else{
 
-            this.getRawPost(function(err, data){
+            this.getRawPostBuffer(function(err, data){
                 var fs = require('fs');
                 var appPath = require('mvc/lib/config').app_path;
+	            console.log((data.length / 1024).toFixed(1));
                 fs.writeFile(appPath + "/temp.jpg", data);
             });
 
@@ -233,9 +234,10 @@ SensorDataController.prototype = {
 					callback(result);
 				}
 				break;
-			case Sensor.Type.PHOTO:
-				break;
 			case Sensor.Type.WEIBO:
+				break;
+			default :
+				callback({message: SensorData.ERR_MESSAGE.SENSOR_TYPE_INVALID, statusCode: 406});
 				break;
 		}
 	},
