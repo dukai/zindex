@@ -3,7 +3,12 @@ var BaseController = require('./base_controller'),
 	Device = require('../models/device'),
 	Sensor = require('../models/sensor'),
 	SensorData = require('../models/sensor_data'),
-	SensorDataHelper = require('../helpers/sensor_data_helper');
+	SensorDataHelper = require('../helpers/sensor_data_helper'),
+	imageinfo = require('imageinfo'),
+	redis = require('redis'),
+	redisClient = redis.createClient(6379, '192.168.0.35', {
+		detect_buffers: true
+	});
 
 var SensorDataController = function(intent){
 	this._initSensorDataController(intent);
@@ -93,18 +98,31 @@ SensorDataController.prototype = {
     },
 
     _addPhoto: function(sensor){
+	    var self = this;
         if(sensor.sensor_type !== Sensor.Type.PHOTO){
             this.exit(SensorData.ERR_MESSAGE.SENSOR_TYPE_INVALID, 406);
         }else{
 
             this.getRawPostBuffer(function(err, data){
-                var fs = require('fs');
-                var appPath = require('mvc/lib/config').app_path;
-	            console.log((data.length / 1024).toFixed(1));
-                fs.writeFile(appPath + "/temp.jpg", data);
-            });
+                //var fs = require('fs');
+                //var appPath = require('mvc/lib/config').app_path;
+	            var info = imageinfo(data);
+	            console.log(info);
+	            if(!info || info.type !== 'image' || (info.format !== 'PNG' && info.format !== 'JPG' && info.format !== 'GIF')){
+		            self.exit(SensorData.ERR_MESSAGE.DATA_FORMAT_INVALID, 406);
+		            return;
+	            }
+	            if(data.length / 1024 > SensorData.PHOTO_MAX_SIZE){
+		            self.exit(SensorData.ERR_MESSAGE.PHOTO_SIZE_TOO_LARGE, 406);
+		            return;
+	            }
 
-            this.exit("HELLO", 200);
+	            redisClient.set("test_file", data);
+	            redisClient.get(new Buffer("test_file"), function(err, reply) {
+		            self.outputFile(reply, info.mimeType);
+	            });
+
+            });
         }
     },
 
