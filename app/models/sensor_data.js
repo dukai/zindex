@@ -21,8 +21,11 @@ SensorData.ERR_MESSAGE = {
     KEY_INVALID: "Key Invalid",
 	REQUEST_INTERVAL_TOO_SHORT: "Request interval is too short (should > 10s)",
 	MYSQL_ERROR: "Mysql Error: ",
-    SENSOR_TYPE_INVALID: "Sensor Type Invalid"
+    SENSOR_TYPE_INVALID: "Sensor Type Invalid",
+	PHOTO_SIZE_TOO_LARGE: "Photo size too large"
 };
+
+SensorData.PHOTO_MAX_SIZE = 200;
 
 oo.extend(SensorData, AbstractModel);
 
