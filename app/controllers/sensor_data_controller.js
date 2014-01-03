@@ -121,6 +121,16 @@ SensorDataController.prototype = {
 	            redisClient.get(new Buffer("test_file"), function(err, reply) {
 		            self.outputFile(reply, info.mimeType);
 	            });
+	            var now = Math.floor(new Date().getTime() / 1000);
+	            var photoData = {
+		            sensor_id: sensor.id,
+		            photo_timestamp: now,
+		            photo_size: Math.round(data.length / 1024),
+		            photo_width: info.width,
+		            photo_height: info.height,
+		            photo_dir: '',
+		            photo_type: info.format.toLowerCase()
+	            };
 
             });
         }
