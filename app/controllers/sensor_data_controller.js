@@ -117,11 +117,12 @@ SensorDataController.prototype = {
 		            return;
 	            }
 
-	            redisClient.set("test_file", data);
-	            redisClient.get(new Buffer("test_file"), function(err, reply) {
-		            self.outputFile(reply, info.mimeType);
-	            });
+
 	            var now = Math.floor(new Date().getTime() / 1000);
+	            var cacheKey = "sf:" + sensor.id + ":" + now + '.' + info.format.toLowerCase();
+	            redisClient.rpush("sensor_photos_queue", cacheKey);
+	            redisClient.set(cacheKey, data);
+
 	            var photoData = {
 		            sensor_id: sensor.id,
 		            photo_timestamp: now,
@@ -131,6 +132,8 @@ SensorDataController.prototype = {
 		            photo_dir: '',
 		            photo_type: info.format.toLowerCase()
 	            };
+
+	            self.exit("OK", 200);
 
             });
         }
