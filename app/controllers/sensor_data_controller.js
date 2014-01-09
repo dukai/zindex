@@ -1,12 +1,13 @@
 var BaseController = require('./base_controller'),
 	oo = require('mvc/lib/utils/oo'),
+	utils = require('mvc/lib/utils'),
 	Device = require('../models/device'),
 	Sensor = require('../models/sensor'),
 	SensorData = require('../models/sensor_data'),
 	SensorDataHelper = require('../helpers/sensor_data_helper'),
 	imageinfo = require('imageinfo'),
 	redis = require('redis'),
-	redisClient = redis.createClient(6379, '192.168.0.35', {
+	redisClient = redis.createClient(6379, '192.168.0.46', {
 		detect_buffers: true
 	});
 
@@ -107,7 +108,6 @@ SensorDataController.prototype = {
                 //var fs = require('fs');
                 //var appPath = require('mvc/lib/config').app_path;
 	            var info = imageinfo(data);
-	            console.log(info);
 	            if(!info || info.type !== 'image' || (info.format !== 'PNG' && info.format !== 'JPG' && info.format !== 'GIF')){
 		            self.exit(SensorData.ERR_MESSAGE.DATA_FORMAT_INVALID, 406);
 		            return;
@@ -122,18 +122,46 @@ SensorDataController.prototype = {
 	            var cacheKey = "sf:" + sensor.id + ":" + now + '.' + info.format.toLowerCase();
 	            redisClient.rpush("sensor_photos_queue", cacheKey);
 	            redisClient.set(cacheKey, data);
+	            if(info.width > info.height){
+		            info.sWidth = 100;
+		            info.sHeight = parseInt(info.height * 100 / info.width);
+	            }else{
+		            info.sHeight = 100;
+		            info.sWidth = parseInt(info.width * 100 / info.height);
+	            }
 
+	            var photoSize = Math.round(data.length / 1024);
 	            var photoData = {
 		            sensor_id: sensor.id,
 		            photo_timestamp: now,
-		            photo_size: Math.round(data.length / 1024),
+		            photo_size: photoSize,
 		            photo_width: info.width,
 		            photo_height: info.height,
-		            photo_dir: '',
+		            photo_s_width: info.sWidth,
+		            photo_s_height: info.sHeight,
+		            photo_dir: '/foto-sensors.b0.upaiyun.com/' + sensor.id + '/',
 		            photo_type: info.format.toLowerCase()
 	            };
+	            SensorData.insertPhotoData(photoData, function(err, result){
+		            self.exit("OK", 200);
+		            if(sensor.sensor_param == '' || !sensor.sensor_param){
+			            SensorData.getPhotoSize(sensor.id, function(size){
+				            size = size ? size: 0;
+				            Sensor.update(sensor.id, {sensor_last_update: now, sensor_param: size}, function(result){
+					            utils.debug(result);
+				            });
+			            });
+		            }else{
+			            Sensor.update(sensor.id, {sensor_last_update: now, sensor_param: parseInt(sensor.sensor_param) + photoSize}, function(result){
+				            utils.debug(result);
+			            });
+		            }
 
-	            self.exit("OK", 200);
+		            Device.updateLastUpdateTime(sensor.device_id, now, function(result){
+			            utils.debug(result);
+		            });
+	            });
+
 
             });
         }

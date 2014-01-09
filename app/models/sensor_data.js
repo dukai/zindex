@@ -1,5 +1,6 @@
 var AbstractModel = require('mvc/lib/abstract_model'),
 	oo = require('mvc/lib/utils/oo'),
+	utils = require('mvc/lib/utils'),
     Sensor = require('./sensor'),
     Device = require('./device');
 
@@ -30,7 +31,7 @@ SensorData.PHOTO_MAX_SIZE = 200;
 oo.extend(SensorData, AbstractModel);
 
 
-
+//添加数值数据
 SensorData.insertValueData = function(data, callback){
     var db = AbstractModel.getDb();
     db.insert('yl_sensor_data', data, function(err, result){
@@ -38,13 +39,21 @@ SensorData.insertValueData = function(data, callback){
         err && console.log(err);
     });
 };
-
+//添加泛型数据
 SensorData.insertGenData = function(data, callback){
 	var db = AbstractModel.getDb();
 	db.insert('yl_sensor_data_gen', data, function(err, result){
 		callback(err, result);
 		err && console.log(err);
 	});
+}
+
+SensorData.insertPhotoData = function(data, callback){
+	var db = AbstractModel.getDb();
+	db.insert('yl_sensor_data_photos', data, function(err, result){
+		callback(err, result);
+		err && utils.debug(err, 'ERR');
+	})
 }
 
 SensorData.getValueData = function(sensorId, timestamp, callback){
@@ -82,6 +91,19 @@ SensorData.getGenData = function(sensorId, key, callback){
 			row.value = JSON.parse(row.value);
 		}
 		callback(err, row);
+	});
+}
+
+SensorData.getPhotoSize = function(sensorId, callback){
+	var sql = "SELECT sum(photo_size) AS sum_size FROM yl_sensor_data_photos WHERE sensor_id=" + sensorId + " AND 1=1";
+	var db = AbstractModel.getDb();
+	db.fetchRow(sql, function(err, row){
+		if(row){
+			callback(row.sum_size);
+		}else{
+			callback(err, row);
+		}
+
 	});
 }
 

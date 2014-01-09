@@ -4,7 +4,7 @@ var yunClient = new UPYun('foto-sensors', 'dukai', 'shuanger');
 yunClient.setApiDomain('v0.api.upyun.com');
 
 var redis = require('redis'),
-	redisClient = redis.createClient(6379, '192.168.0.35', {
+	redisClient = redis.createClient(6379, '192.168.0.46', {
 		detect_buffers: true
 	});
 
